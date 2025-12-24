@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI活用100本ノック — DeNA</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --white: #FFFFFF;
+            --off-white: #FAFAFA;
+            --gray-100: #F5F5F5;
+            --gray-200: #E5E5E5;
+            --gray-400: #A3A3A3;
+            --gray-600: #525252;
+            --black: #0A0A0A;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        html {
+            font-size: 15px;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background: var(--white);
+            color: var(--black);
+            line-height: 1.6;
+            font-weight: 400;
+        }
+        
+        .en { font-family: 'DM Sans', sans-serif; }
+        
+        .hero {
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            padding: 32px 48px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .hero-top span {
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            color: var(--gray-600);
+            text-transform: uppercase;
+        }
+        
+        .hero-center {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            gap: 24px;
+        }
+        
+        .hero-label {
+            font-size: 11px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--gray-400);
+        }
+        
+        .hero-title {
+            font-size: clamp(48px, 10vw, 120px);
+            font-weight: 300;
+            letter-spacing: -0.03em;
+            line-height: 0.95;
+        }
+        
+        .hero-sub {
+            font-size: 14px;
+            color: var(--gray-600);
+            max-width: 400px;
+            line-height: 1.8;
+        }
+        
+        .hero-bottom {
+            display: flex;
+            justify-content: center;
+            gap: 64px;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-num {
+            font-size: 48px;
+            font-weight: 300;
+            letter-spacing: -0.02em;
+            line-height: 1;
+        }
+        
+        .stat-label {
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--gray-400);
+            margin-top: 8px;
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .search-box {
+            padding: 24px 32px;
+            border-right: 1px solid var(--gray-200);
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px 0;
+            border: none;
+            border-bottom: 1px solid var(--gray-200);
+            background: transparent;
+            font-family: inherit;
+            font-size: 13px;
+            color: var(--black);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        .search-input::placeholder { color: var(--gray-400); }
+        .search-input:focus { border-color: var(--black); }
+        
+        .filter-box {
+            padding: 24px 32px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--gray-200);
+            background: transparent;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .filter-btn:hover {
+            border-color: var(--black);
+            color: var(--black);
+        }
+        
+        .filter-btn.active {
+            background: var(--black);
+            border-color: var(--black);
+            color: var(--white);
+        }
+        
+        .main {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+        }
+        
+        .sidebar {
+            border-right: 1px solid var(--gray-200);
+            padding: 32px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar-title {
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--gray-400);
+            margin-bottom: 24px;
+        }
+        
+        .cat-nav {
+            list-style: none;
+        }
+        
+        .cat-nav-item {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--gray-100);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .cat-nav-item:hover { padding-left: 8px; }
+        
+        .cat-nav-num {
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            color: var(--gray-400);
+            margin-right: 12px;
+        }
+        
+        .cat-nav-name {
+            font-size: 13px;
+        }
+        
+        .cat-nav-count {
+            float: right;
+            font-size: 11px;
+            color: var(--gray-400);
+        }
+        
+        .content {
+            padding: 0;
+        }
+        
+        .category-section {
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .category-header {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: end;
+            padding: 48px 48px 32px;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        
+        .category-num {
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            color: var(--gray-400);
+            margin-bottom: 8px;
+        }
+        
+        .category-title {
+            font-size: 28px;
+            font-weight: 400;
+            letter-spacing: -0.02em;
+        }
+        
+        .category-count {
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            color: var(--gray-400);
+            text-transform: uppercase;
+        }
+        
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .tip-card {
+            padding: 32px 48px;
+            border-bottom: 1px solid var(--gray-100);
+            border-right: 1px solid var(--gray-100);
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .tip-card:nth-child(2n) { border-right: none; }
+        
+        .tip-card:hover { background: var(--off-white); }
+        
+        .tip-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .tip-num {
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            color: var(--gray-400);
+        }
+        
+        .tip-arrow {
+            font-size: 18px;
+            color: var(--gray-400);
+            transition: transform 0.2s, color 0.2s;
+        }
+        
+        .tip-card:hover .tip-arrow {
+            transform: translateX(4px);
+            color: var(--black);
+        }
+        
+        .tip-title {
+            font-size: 15px;
+            font-weight: 400;
+            line-height: 1.6;
+        }
+        
+        .tip-tools {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .tool-tag {
+            font-size: 10px;
+            letter-spacing: 0.05em;
+            padding: 4px 10px;
+            background: var(--gray-100);
+            color: var(--gray-600);
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10,10,10,0.85);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            max-width: 640px;
+            height: 100%;
+            background: var(--black);
+            color: var(--white);
+            z-index: 1001;
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal.active { transform: translateX(0); }
+        
+        .modal-header {
+            padding: 48px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: transparent;
+            color: var(--white);
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .modal-close:hover {
+            background: var(--white);
+            color: var(--black);
+        }
+        
+        .modal-meta {
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            margin-bottom: 24px;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            font-weight: 400;
+            line-height: 1.4;
+            margin-bottom: 24px;
+            padding-right: 48px;
+        }
+        
+        .modal-tools {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .modal-tools .tool-tag {
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 48px;
+        }
+        
+        .modal-section {
+            margin-bottom: 40px;
+        }
+        
+        .modal-section:last-child { margin-bottom: 0; }
+        
+        .modal-label {
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        
+        .modal-text {
+            font-size: 14px;
+            line-height: 1.9;
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .modal-steps {
+            margin-top: 32px;
+            padding: 24px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .modal-steps-title {
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+        
+        .modal-steps-list {
+            list-style: none;
+            counter-reset: step;
+        }
+        
+        .modal-steps-list li {
+            counter-increment: step;
+            font-size: 13px;
+            line-height: 1.7;
+            color: rgba(255,255,255,0.75);
+            padding: 12px 0 12px 40px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            position: relative;
+        }
+        
+        .modal-steps-list li:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        
+        .modal-steps-list li::before {
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            top: 12px;
+            width: 24px;
+            height: 24px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.6);
+        }
+        
+        .modal-quote {
+            margin-top: 32px;
+            padding: 24px;
+            border-left: 2px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.03);
+        }
+        
+        .modal-quote-text {
+            font-size: 14px;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.7);
+            font-style: italic;
+        }
+        
+        .modal-quote-label {
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            color: rgba(255,255,255,0.3);
+            text-transform: uppercase;
+            margin-top: 16px;
+        }
+        
+        .footer {
+            padding: 48px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--gray-400);
+            letter-spacing: 0.05em;
+        }
+        
+        @media (max-width: 1024px) {
+            .hero { padding: 24px; }
+            .controls { grid-template-columns: 1fr; }
+            .search-box { border-right: none; border-bottom: 1px solid var(--gray-200); }
+            .main { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+            .tips-grid { grid-template-columns: 1fr; }
+            .tip-card { border-right: none; }
+            .category-header, .tip-card { padding: 24px; }
+        }
+        
+        @media (max-width: 640px) {
+            .hero-bottom { gap: 32px; }
+            .stat-num { font-size: 32px; }
+            .modal { max-width: 100%; }
+            .modal-header, .modal-body { padding: 24px; }
+        }
+        
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--gray-200); }
+        .modal-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
+    </style>
+</head>
+<body>
+    <section class="hero">
+        <div class="hero-top">
+            <span class="en">DeNA AI Catalog</span>
+            <span class="en">2025</span>
+        </div>
+        <div class="hero-center">
+            <span class="hero-label en">Case Studies</span>
+            <h1 class="hero-title">AI活用<br>100本ノック</h1>
+            <p class="hero-sub">DeNA社内で実践されているAI活用事例を体系的に整理。課題解決から成果まで、100の実践知を収録。</p>
+        </div>
+        <div class="hero-bottom">
+            <div class="stat">
+                <div class="stat-num en">100</div>
+                <div class="stat-label en">Cases</div>
+            </div>
+            <div class="stat">
+                <div class="stat-num en">10</div>
+                <div class="stat-label en">Categories</div>
+            </div>
+            <div class="stat">
+                <div class="stat-num en">20+</div>
+                <div class="stat-label en">Tools</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="controls">
+        <div class="search-box">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search...">
+        </div>
+        <div class="filter-box" id="filters"></div>
+    </section>
+
+    <main class="main">
+        <aside class="sidebar">
+            <div class="sidebar-title en">Categories</div>
+            <ul class="cat-nav" id="catNav"></ul>
+        </aside>
+        <div class="content" id="content"></div>
+    </main>
+
+    <footer class="footer">
+        <span>© DeNA Co., Ltd.</span>
+        <span class="en">AI 100 Tips Catalog</span>
+    </footer>
+
+    <div class="modal-overlay" id="overlay"></div>
+    <div class="modal" id="modal">
+        <div class="modal-header">
+            <button class="modal-close" id="closeBtn">✕</button>
+            <div class="modal-meta en" id="modalMeta"></div>
+            <h2 class="modal-title" id="modalTitle"></h2>
+            <div class="modal-tools" id="modalTools"></div>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+    </div>
+
+<script>
+const cats = [
+    { id: 'document', name: '文書作成', nameEn: 'Document' },
+    { id: 'coding', name: 'コーディング', nameEn: 'Coding' },
+    { id: 'data', name: 'データ分析', nameEn: 'Data Analysis' },
+    { id: 'automation', name: '業務自動化', nameEn: 'Automation' },
+    { id: 'research', name: 'リサーチ', nameEn: 'Research' },
+    { id: 'learning', name: '学習', nameEn: 'Learning' },
+    { id: 'meeting', name: '会議', nameEn: 'Meeting' },
+    { id: 'design', name: 'デザイン', nameEn: 'Design' },
+    { id: 'planning', name: '企画', nameEn: 'Planning' },
+    { id: 'security', name: 'セキュリティ', nameEn: 'Security' }
+];
+
+const tips = [
+    { id: 1, cat: 'document', title: 'NotebookLMでWebサイト参照が爆速化', tools: ['NotebookLM'], challenge: '法律やガイドラインの内容を体系的に整理するのに時間がかかっていた', solution: 'WebサイトのURLをNotebookLMにソースとして追加し、関連キーワードで質問して該当箇所を抜粋・要約', result: '情報のインプットを効率化し、より本質的な思考や創造的な作業に注力できるようになった', voice: 'もう手放せません！法律等の参照がこんなに簡単になるなんて', steps: ['NotebookLMを開き、新しいノートブックを作成', '「ソースを追加」から参照したいWebサイトのURLを入力', '追加されたソースに対して「〇〇について要約して」等の質問を入力', 'AIが該当箇所を抜粋・要約して回答を生成', '必要に応じて追加質問で深掘りし、情報を整理'] },
+    { id: 2, cat: 'data', title: 'GoogleドライブでPDF情報を即座に取得', tools: ['Gemini'], challenge: '大量のPDF資料から特定の情報を探し出すのに時間と手間がかかっていた', solution: 'Googleドライブ上のPDFでGeminiを開き、内容に関する具体的な質問を入力', result: '情報収集にかかる時間を大幅に短縮。英文PDFも和訳して回答してくれる', voice: 'ページ数が多いPDF資料の中から、必要な情報を瞬時に見つけられるようになりました', steps: ['GoogleドライブにPDFファイルをアップロード', 'PDFファイルを開き、右上の「Geminiで開く」をクリック', '「このPDFの〇〇について教えて」など具体的な質問を入力', 'Geminiが該当箇所を特定し回答を生成', '英文PDFの場合は「日本語で要約して」と追加指示'] },
+    { id: 3, cat: 'coding', title: 'GitHub Copilotでコードレビュー自動化', tools: ['GitHub Copilot'], challenge: '手動でのコードレビューは時間と労力がかかり、開発のボトルネックになっていた', solution: 'GitHub Copilot code reviewを使った自動PRレビューを実施', result: 'PoC段階だが、精度は業務利用に十分なレベル', voice: 'コードの品質向上とレビュー担当者の負担軽減につながると感じています', steps: ['GitHubリポジトリでGitHub Copilotを有効化', 'プルリクエストを作成', 'Copilot code reviewをリクエスト（PRページから実行）', 'AIがコードの問題点、改善提案を自動でコメント', '提案内容を確認し、必要に応じて修正を適用'] },
+    { id: 4, cat: 'coding', title: 'プログラミング知識ゼロからChrome拡張を開発', tools: ['生成AI'], challenge: 'セキュリティ要件を満たすOGP画像表示ツールが必要だったが、既存ツールでは対応できなかった', solution: '生成AIに機能要件とセキュリティ要望を伝え、Chrome拡張機能を開発依頼', result: 'エンジニアレビュー後、必要な画像テストを安全に実施できるようになった', voice: 'セキュリティに配慮しつつ、必要な機能を備えたツールを自作できました！', steps: ['実現したい機能を箇条書きで整理（例：OGP画像を表示、特定ドメインのみ動作）', '生成AIに「Chrome拡張機能を作成して」と依頼し、要件を伝える', 'AIが生成したmanifest.json、background.js等のコードを取得', 'chrome://extensionsで「デベロッパーモード」をONにし、フォルダを読み込み', 'エンジニアにセキュリティレビューを依頼してから本番利用'] },
+    { id: 5, cat: 'learning', title: '勉強会動画から専門用語集を自動作成', tools: ['Gemini'], challenge: '社内勉強会の動画には専門用語が多く、視聴者が内容を理解するのが難しかった', solution: 'Geminiに動画を添付し「この動画内の〇〇分野の用語集を作って」と指示', result: '動画内容に沿った専門用語集を素早く簡単に作成できるようになった', voice: '利用者目線のアウトプットをスピーディーに作成できました', steps: ['勉強会の録画動画ファイルを用意', 'Gemini（動画対応版）を開き、動画ファイルをアップロード', '「この動画に出てくる〇〇分野の専門用語を抽出し、用語集を作成して」と指示', 'AIが用語と説明のリストを生成', '内容を確認・編集し、参加者に共有'] },
+    { id: 6, cat: 'meeting', title: 'Meet・Gemini・NotebookLMで議事録工数をほぼゼロに', tools: ['Gemini', 'NotebookLM'], challenge: '会議の議事録作成や欠席者への情報共有が負担になっていた', solution: 'MeetとGeminiで文字起こしを自動化し、NotebookLMに集約・ストック', result: '議事録作成の工数をほぼゼロに。次回議題作成や報告業務も効率化', voice: '会議後の議事録作成や情報共有のストレスが完全に解消されました！', steps: ['Google Meetの設定で「文字起こし」を有効化して会議を実施', '会議終了後、自動生成された文字起こしデータを取得', 'Geminiに文字起こしを渡し「議事録形式でまとめて」と指示', '生成された議事録をNotebookLMにソースとして追加', '過去の議事録をNotebookLMで横断検索・質問可能に'] },
+    { id: 7, cat: 'data', title: 'マインドマップで企画検証項目を視覚化', tools: ['NotebookLM'], challenge: '企画の振り返りで検証項目が膨大にあり、最適な項目選択に時間がかかっていた', solution: 'NotebookLMのマインドマップ機能で検証項目を図式化', result: '見過ごしていた検証指数に気づけるようになり、具体的な改善案を複数出せるようになった', voice: 'データ分析への苦手意識がなくなりました！', steps: ['企画資料や分析データをNotebookLMにアップロード', '「この企画の検証項目をマインドマップで整理して」と指示', 'NotebookLMがマインドマップ形式で検証項目を可視化', '抜け漏れている観点がないか確認', '各項目について「詳しく教えて」で深掘り'] },
+    { id: 8, cat: 'data', title: '画像入力でSQL自動生成', tools: ['Cursor'], challenge: '分析の要件定義書をSQL文に変換する作業に経験と時間が必要だった', solution: 'Cursorにスプレッドシートの要件定義書を画像として入力し、SQLを自動生成', result: '分析メンバーはレビューのみで済むようになる見込み', voice: 'スプレッドシートからSQLが生成されれば、本質的な分析に注力できます', steps: ['スプレッドシートの要件定義書をスクリーンショットで取得', 'Cursorを開き、画像を添付', '「この要件定義書に基づいてSQLクエリを生成して」と指示', 'AIがテーブル構造を推測しSQLを生成', '生成されたSQLをレビューし、必要に応じて修正'] },
+    { id: 9, cat: 'document', title: 'DeepResearchで口コミ分析レポート作成', tools: ['Gemini', 'DeepResearch'], challenge: '週次ソーシャル報告レポートの作成に最大4時間かかっていた', solution: 'GeminiのDeepResearch機能でネット上の口コミを網羅的に調査し、トピックごとに要約', result: 'レポート作成時間が30分程度に短縮', voice: '要約された情報をコピペするだけで、高品質なレポートが完成します', steps: ['Geminiを開き、DeepResearchモードを選択', '「〇〇（製品名）の直近1週間の口コミを調査して」と指示', 'AIがWeb上の口コミを網羅的に収集・分析', 'トピックごとに要約されたレポートを確認', '必要な部分を抜粋してレポートに転記'] },
+    { id: 10, cat: 'document', title: '法令解釈をポッドキャスト化して共有', tools: ['NotebookLM'], challenge: '複雑な医療関連の法令を理解するのに時間がかかっていた', solution: 'NotebookLMに法令解釈を読み込ませ、FAQを作成してポッドキャスト化', result: '耳からも情報を得られるようになり、他チームにも共有されて業務効率化に貢献', voice: '音声で聞くことで「スッと内容が入ってくる」と好評です', steps: ['法令文書やガイドラインをNotebookLMにアップロード', '「この法令のFAQを作成して」と指示', '生成されたFAQを確認・編集', 'NotebookLMの「Audio Overview」機能で音声化', '生成されたポッドキャストのリンクをチームに共有'] },
+    { id: 11, cat: 'automation', title: '大量のファイル名変更をGASで一瞬で完了', tools: ['Gemini', 'GAS'], challenge: '毎日手作業でファイルをルールに沿ってリネームしていた', solution: 'Geminiに相談してスプレッドシートでファイル名を一括変更できるGASを作成', result: '作業時間を大幅に短縮し、手作業によるミスもなくなった', voice: '面倒だと感じていた単純作業から解放されストレスが大きく減りました', steps: ['リネームルールを整理（例：日付_プロジェクト名_連番）', 'Geminiに「Googleドライブのファイルを一括リネームするGASを作って」と依頼', '生成されたコードをGoogleスプレッドシートのApps Scriptに貼り付け', 'スプレッドシートにフォルダIDとリネームルールを入力', 'スクリプトを実行してファイル名を一括変更'] },
+    { id: 12, cat: 'automation', title: 'Slack通知からJIRAチケットを自動起票', tools: ['Gemini', 'GAS'], challenge: 'Slack通知後に手動でJIRAチケットを作成する必要があり手間だった', solution: 'Geminiに依頼して、Slack通知からJIRAチケットを自動作成するGASを生成', result: 'チケットの起票漏れがなくなり、工数を大幅削減', voice: 'プログラミングの手間なく自動化・効率化を実現できました', steps: ['Slack APIとJIRA APIのトークンを取得', 'Geminiに「Slackの特定チャンネルの投稿をJIRAチケットに自動起票するGASを作って」と依頼', '生成されたコードをApps Scriptにコピー', 'APIトークンと対象チャンネルIDを設定', 'トリガーを設定して定期実行を有効化'] },
+    { id: 13, cat: 'coding', title: 'AIに博多弁の人格を設定してコーディング効率UP', tools: ['Cursor', 'Claude Code'], challenge: 'AIの機械的な返答にストレスを感じていた', solution: '「博多弁で話す美術や落語に詳しいAI」として口調を設定', result: 'AIに話しかけるハードルが下がり、カジュアルに相談できるようになった', voice: '変な出力にも「この子かわいいな」という思考になり、精神衛生が向上しました', steps: ['CursorまたはClaude Codeの設定画面を開く', 'システムプロンプト（.cursorrules等）を編集', '「あなたは博多弁で話す、美術や落語に詳しいAIアシスタントです」等の人格設定を記述', '口調の例文も追加して精度を上げる', '設定を保存し、通常通りコーディングに活用'] },
+    { id: 14, cat: 'learning', title: 'PM研修教材をChatGPTで短期間作成', tools: ['ChatGPT'], challenge: '2時間×2日間のPM研修教材を短期間で作成する必要があった', solution: 'ChatGPTで構成の壁打ち、トークスクリプトの参考案を作成', result: '教材作成時間の短縮とストレスの緩和に繋がった', voice: '難しい内容も「優しく答えて」などプロンプトで利用者に沿った形で理解できました', steps: ['研修の目的・対象者・時間配分を整理', 'ChatGPTに「PM研修のカリキュラム案を作成して」と依頼', '提案された構成をベースに内容を壁打ち', '各セクションのトークスクリプト案を生成', '出力を参考に最終的な教材を作成'] },
+    { id: 15, cat: 'automation', title: '全社の異動情報をGASで自動可視化', tools: ['Gemini', 'GAS'], challenge: '異動情報のCSVデータが分かりにくく、マネージャーへの共有が困難だった', solution: 'Geminiと対話しながら、異動情報を自動で整理・展開するGASを作成', result: '情報共有がスムーズかつセキュアになり、管理コストを大幅削減', voice: 'プログラミングの知識がなくても、AIとの対話でここまで出来ることに驚きました', steps: ['異動情報CSVのフォーマットを確認', 'Geminiに「CSVを読み込んで部署別・期間別に整理するGASを作って」と依頼', '生成されたコードをApps Scriptに貼り付け', 'スプレッドシートにCSVをインポートし実行', '整理されたデータを権限設定して共有'] },
+    { id: 16, cat: 'automation', title: '画像を送るだけでカレンダーに自動登録', tools: ['Gemini'], challenge: '複数の予定をGoogleカレンダーに手で一つずつ入力するのが手間だった', solution: 'Geminiアプリにスケジュールの写真を送って「カレンダーに入れて」と依頼', result: '手動入力の手間が大幅に削減され、時短に繋がった', voice: 'スマホで撮って送るだけで登録作業が終わるのは本当に楽です', steps: ['予定表やチラシをスマホで撮影', 'Geminiアプリを開き、画像を添付', '「この予定をGoogleカレンダーに登録して」と指示', 'Geminiが日時・タイトル・場所を抽出', '確認画面で内容をチェックし、カレンダーに追加'] },
+    { id: 17, cat: 'coding', title: 'データ連携作業を自動化し数人日分の工数を削減', tools: ['Cursor', 'Claude'], challenge: 'WebUIから手作業でのデータ連携作業に時間がかかっていた', solution: 'AIにコードベース調査、実現案検討、スクリプト実装まで依頼', result: '本来数時間かかる作業がわずか30分で完了', voice: '工数を、おそらく数人日単位で削減できました', steps: ['自動化したい作業フローを整理', 'Cursorでプロジェクトを開き、既存コードベースを読み込み', '「このデータ連携作業を自動化するスクリプトを作成して」と指示', 'AIが既存コードを参照しながら実装案を提案', 'コードをレビュー・テストして本番適用'] },
+    { id: 18, cat: 'planning', title: 'AIとの対話でモックアップ作成が3日も早くなった', tools: ['Gemini'], challenge: '企画のモックアップを一から考えるのに多くの時間がかかっていた', solution: 'Geminiに企画要件を伝え、対話しながらモックアップの構成案を作成', result: '初期の画面構成案作成が大幅に短縮され、メンバーとの意思疎通も効率化', voice: 'AIが壁打ち相手になってくれることで、企画の解像度も上がりました', steps: ['企画の目的・ターゲット・主要機能を整理', 'Geminiに「〇〇アプリの画面構成案を考えて」と依頼', '提案された構成に対して「〇〇機能を追加して」等のフィードバック', '対話を繰り返しながら構成を詰める', '最終案をFigma等でモックアップ化'] },
+    { id: 19, cat: 'research', title: 'コピーライティングの考え方とワーディングを分析', tools: ['Gemini'], challenge: 'AIのコピー生成は品質担保に経験が必要だった', solution: 'Geminiにコピーライターの設定を与え、コピーの構造・ワーディングを分析させてフレームワーク化', result: 'AIによるコピーの精度や効率が向上', voice: 'クリエイティブ職以外の方でも良い品質の成果物を得られるようにしていきたいです', steps: ['優れたコピーのサンプルを複数収集', 'Geminiに「あなたはベテランのコピーライターです」と設定', '「このコピーの構造とワーディングの特徴を分析して」と指示', '分析結果をフレームワーク化して整理', 'フレームワークを使って新しいコピーを生成'] },
+    { id: 20, cat: 'security', title: 'ネットワーク障害アラートの初動対応を自動化', tools: ['Gemini', 'LangChain'], challenge: '24時間365日のアラート対応で影響範囲特定・原因調査に時間がかかっていた', solution: 'GeminiとLangChainでアラート情報を自動取得・分析するエージェント「NOA」を開発', result: '障害対応の初動を大幅に効率化。エンジニアは高度な判断に集中できるようになった', voice: '人間は最終確認と対応に集中できるようになり、スピードと質が向上しました', steps: ['アラート情報の取得元API（監視ツール等）を特定', 'LangChainでGeminiと各種APIを連携するエージェントを設計', 'アラート受信時に影響範囲・関連ログを自動取得するフローを実装', '分析結果をSlackに自動投稿する処理を追加', '継続的に精度を改善しながら運用'] },
+    { id: 21, cat: 'automation', title: 'ObsidianとCursorでタスク管理を自動更新', tools: ['Cursor', 'Obsidian'], challenge: 'タスク・プロジェクト管理の煩雑さと更新漏れがあった', solution: 'Cursor連携でObsidianに「やったこと」を箇条書きするだけで進捗管理を自動化', result: '更新漏れゼロ！プロジェクトの全体像が常に明確に', voice: '効率的な進行が可能になりました', steps: ['Obsidianでタスク管理用のテンプレートを作成', 'Cursorでプロジェクトフォルダを開く', '「今日やったこと」を箇条書きで記録', 'CursorのAIに「進捗を集計して更新して」と指示', 'AIがタスクの完了状況を自動で反映'] },
+    { id: 22, cat: 'planning', title: 'イベント企画から実行までAIがサポート', tools: ['Gemini'], challenge: 'KPI設定、施策検討、取材対応、進行管理に時間と労力がかかっていた', solution: 'KPIの考え方や施策の壁打ち、スケジュール設計をAIに相談', result: '企画・実行の効率化と運営品質の向上、負荷軽減に繋がった', voice: '他業務の合間に検討でき、まとまった時間が不要で便利です', steps: ['イベントの目的・規模・予算を整理', 'Geminiに「〇〇イベントのKPI案を提案して」と依頼', '提案されたKPIをベースに施策を壁打ち', '「スケジュールを作成して」で進行表を生成', '各フェーズでAIに相談しながら進行'] },
+    { id: 23, cat: 'data', title: 'Cloudwatch Logsの非構造化データから業務問題を洗い出し', tools: ['Cursor', 'Claude'], challenge: '大量の非構造化ログから業務上の問題を手動で探すのは困難だった', solution: '業務上問題があるデータを洗い出すPythonスクリプトの作成を依頼', result: '問題の早期発見と迅速な対応が可能に', voice: '担当者も「いつも大変お世話になっております！」と大絶賛', steps: ['Cloudwatch Logsからログデータをエクスポート', 'Cursorでプロジェクトを作成し、ログファイルを配置', '「このログから異常パターンを検出するPythonスクリプトを作成して」と指示', 'AIが生成したスクリプトをテスト実行', '検出ルールを調整しながら精度を向上'] },
+    { id: 24, cat: 'coding', title: 'リポジトリ丸ごと爆速・高精度なレビューを実現', tools: ['Gemini 2.5 Pro'], challenge: '従来のAIレビューではコンテキストが正確に伝わらず、網羅性や精度に限界があった', solution: 'Gemini 2.5 Proでリポジトリ全体を対象に脆弱性・パフォーマンス・設計レビューを実施', result: '複数ファイルにまたがるロジックの脆弱性も検出可能に。レビューは約5分で完了', voice: 'もはや人間だけのレビューには戻れないレベルに達していると感じます', steps: ['リポジトリをzip化またはGitHub連携で準備', 'Gemini 2.5 Pro（大容量コンテキスト対応）を開く', 'リポジトリ全体をアップロード', '「セキュリティ脆弱性、パフォーマンス問題、設計上の改善点をレビューして」と指示', 'レビュー結果を確認し、優先度をつけて対応'] },
+    { id: 25, cat: 'data', title: 'DifyでSQL生成からデータ分析まで自然言語で実行', tools: ['Dify', 'Claude'], challenge: 'データ利活用にSQL習熟が必要で、限られた人員しかデータを扱えなかった', solution: 'データ基盤とDifyを連携し、自然言語で分析まで実行可能に', result: 'SQLを触ったことないメンバーが自らデータ分析して施策検討できるようになった', voice: 'LLM相手なら納得いくまでやり取りができて、満足度が高いです', steps: ['Difyでワークフローを新規作成', 'データベース接続の設定を追加', 'LLM（Claude）ノードを追加し、SQL生成プロンプトを設定', '「〇〇の売上を月別で集計して」等の自然言語入力でテスト', '権限設定をして社内メンバーに公開'] },
+    { id: 26, cat: 'coding', title: 'DevinでバイブコーディングしてPR作成', tools: ['Devin'], challenge: 'QA担当がツール修正をエンジニアに依頼するしかなく、もどかしさがあった', solution: 'AIソフトウェアエンジニア「Devin」に自然言語で指示してツール修正', result: '職種の壁を越えて、自身でPRを出してプロダクト改善サイクルを回せるようになった', voice: 'アイデアをすぐに形にできるようになりました', steps: ['Devinにリポジトリへのアクセス権限を付与', 'Slackまたは専用UIからDevinに修正内容を自然言語で指示', 'Devinがコードを修正し、PRを自動作成', 'PRの内容をレビュー', '問題なければマージして完了'] },
+    { id: 27, cat: 'research', title: 'Deep Researchで諸外国の概況を事前調査', tools: ['DeepResearch'], challenge: '仕向地の言語や事情に精通していない状況で、法令や要請の調査に時間を要していた', solution: 'Deep Researchに法令内容と事業者の対応状況を一覧化させる', result: 'インターネット上の実例を元に、広く浅く概況を把握する資料が得られる', voice: 'ハルシネーションが存在する前提で運用可能。調査の足掛かりとして有用', steps: ['調査対象国・分野・観点を整理', 'Deep Research機能を開く', '「〇〇国の△△規制について、法令内容と企業の対応状況を調査して」と指示', 'AIが複数ソースから情報を収集・整理', '出典を確認しながら、深掘りが必要な点を特定'] },
+    { id: 28, cat: 'coding', title: '非エンジニアがコマンド一つでモック確認', tools: ['Cursor', 'Claude'], challenge: '非エンジニアがモックをローカルで確認する際、環境構築で沼っていた', solution: 'Cursor Agentに「立ち上げて」と言うだけで必要なコマンドを自動実行', result: '非エンジニアでも簡単にモックをチェックできるようになった', voice: 'ユーザーフレンドリーな操作性で扱いやすいです', steps: ['Cursorでプロジェクトフォルダを開く', 'Agent機能を有効化', '「このプロジェクトを立ち上げて」と指示', 'Agentが必要なコマンド（npm install、npm run dev等）を自動実行', 'ブラウザでモックを確認'] },
+    { id: 29, cat: 'security', title: '新機能のテストケース作成をAIで効率化', tools: ['Gemini Flash'], challenge: 'リリース速度と品質を保ちながら品質チェック工程を効率化したかった', solution: 'PRDをインプットにGemini Flashでテスト観点を作成し、レビューも依頼', result: 'テスト観点抽出からレビューまでの一連のプロセスを効率化、品質も向上', voice: 'AIはタイミングや回数に気兼ねなくいつでもレビューの相方になってくれて心強い', steps: ['PRD（製品要求仕様書）を準備', 'Gemini Flashに「このPRDからテスト観点を洗い出して」と依頼', '生成されたテスト観点をレビュー', '「抜け漏れがないかチェックして」で追加観点を確認', 'テストケースとして整理し、QAチームに展開'] },
+    { id: 30, cat: 'coding', title: 'Pythonコードの品質改善', tools: ['Cursor', 'Claude'], challenge: 'Type HintやLinterが未適用のPoCコードをプロダクション移行する際、エラー検知が複雑だった', solution: 'Cursorにコードベースを読み込ませ「Ruffやmypyのエラーがゼロになるまで修正せよ」と指示', result: 'AIが自動的に修正案を生成・適用し、品質が大きく改善', voice: '実際にコマンドを実行しながら進めてくれるので、進捗が分かりやすく良かったです', steps: ['Cursorでプロジェクトを開く', 'ruffとmypyをインストール', 'Agentに「ruff check .とmypy .のエラーがゼロになるまでコードを修正して」と指示', 'AIがエラーを検出し、順次修正を適用', '最終的にエラーゼロを確認してコミット'] },
+    { id: 31, cat: 'document', title: 'Confluenceから情報を自動集約し報告資料を生成', tools: ['Gemini'], challenge: 'Confluence上の複数ページから情報を収集して資料にまとめる作業が非常に手間だった', solution: 'Confluenceから情報を取得しマークダウン形式に変換、Geminiで報告資料にまとめる', result: '情報収集と資料作成の手間が大幅に削減され、月次報告の準備が迅速に', voice: '散らばっていた情報をAIが一瞬で集約してくれるので、報告業務の負担が劇的に軽くなりました', steps: ['Confluenceの対象ページをエクスポートまたはコピー', 'マークダウン形式に変換（手動またはツール使用）', 'Geminiに「この情報を報告資料形式でまとめて」と依頼', '生成された報告資料の構成・内容を確認', '必要に応じて編集し、最終資料として完成'] },
+    { id: 32, cat: 'security', title: 'アンケート動作テスト用のペルソナパターンをAI生成', tools: ['Gemini'], challenge: 'アンケートの動作テスト用に複数の回答者パターンを作成するのが手間だった', solution: 'Geminiに分岐点を指示し、チェック担当者×デバイス×ペルソナの組み合わせを生成', result: 'AIが網羅的に洗い出してくれ、チェック品質が向上し作業時間も短縮', voice: '動作確認作業の信頼性向上にもつながりました', steps: ['アンケートの分岐条件を整理', 'Geminiに「以下の分岐条件に基づいてテストパターンを網羅的に生成して」と依頼', '担当者・デバイス・ペルソナの組み合わせを出力', '生成されたパターンを確認し、不足があれば追加', 'テスト担当者に割り振って動作確認を実施'] },
+    { id: 33, cat: 'planning', title: '開発案件の工数見積もりを1週間→2日に短縮', tools: ['Gemini', 'Cline'], challenge: '工数見積もりに技術調査やタスク洗い出しで時間がかかり、精度にばらつきがあった', solution: 'Clineでコードベースを解析し実装方針を作成、Geminiでタスク分解して見積もり', result: '1週間かかっていた見積もりが2日で完了、精度も大幅向上', voice: 'AIが実装方針からタスク分解まで行ってくれるため、属人化を防げます', steps: ['Clineで既存コードベースを読み込み', '「この機能を追加する場合の実装方針を提案して」と指示', '提案された実装方針をGeminiに渡す', '「この実装方針をタスク分解し、各タスクの工数を見積もって」と依頼', '見積もり結果をレビューし、調整して確定'] },
+    { id: 34, cat: 'meeting', title: 'Slackスタンプのリアクション集計を秒速で完了', tools: ['NotebookLM'], challenge: 'Slackスタンプを押したメンバーを目視で集計するのが手間だった', solution: 'スタンプを押したメンバー表示のスクショをNotebookLMに渡してリスト化', result: '目視でリスト化していた作業が一瞬で完了', voice: '画像をAIに渡すだけで情報を整理してくれる手軽さに驚きました', steps: ['Slackでリアクションを表示し、スクリーンショットを撮影', 'NotebookLMを開き、画像をアップロード', '「この画像からリアクションしたメンバーをリスト化して」と指示', 'AIがメンバー名を抽出してリストを生成', 'リストをコピーして集計に活用'] },
+    { id: 35, cat: 'meeting', title: 'Atlassian RovoでAIがアジェンダを事前準備', tools: ['Atlassian Rovo', 'Jira'], challenge: '週次定例前にJiraチケットを確認してアジェンダをまとめる作業に時間がかかっていた', solution: 'Atlassian RovoとJira Automationを連携し、毎週自動でアジェンダを作成', result: '会議の準備時間が不要になり、進行がスムーズで議論が活発に', voice: 'もうAIのいない会議には戻れません', steps: ['Atlassian Rovoを有効化', 'Jira Automationで「毎週金曜にアジェンダ作成」ルールを設定', 'Rovoに「今週更新されたチケットからアジェンダを作成」と指示するトリガーを追加', '自動生成されたアジェンダをConfluenceに保存', '定例会議で自動作成されたアジェンダを活用'] },
+    { id: 36, cat: 'design', title: 'Fireflyでプレゼン資料の挿絵をAI生成', tools: ['Adobe Firefly', 'Photoshop'], challenge: '内容に合う挿絵を見つけるのに時間がかかり、商用利用可能な素材も限られていた', solution: 'Adobe Fireflyでプレゼン内容に合わせた画像を生成し、Photoshopで微調整', result: 'コンテンツに合った画像を短時間で作成でき、資料全体のクオリティが向上', voice: '画像探しに費やしていた時間を、内容のブラッシュアップに使えるようになりました', steps: ['プレゼン資料のテーマ・トーンを確認', 'Adobe Fireflyを開き、イメージを言語化したプロンプトを入力', '複数の候補から最適な画像を選択', 'Photoshopで色調・サイズを微調整', '資料に挿入して完成'] },
+    { id: 37, cat: 'meeting', title: '社内ミーティング議事録を再要約→Slack共有まで自動化', tools: ['Gemini', 'Vertex AI'], challenge: 'Meetの自動議事録は精度が不十分で、手直しや再要約が必要だった', solution: 'Meetの議事録をVertexAIに渡しGeminiで再要約、Slackに自動投稿するGASを開発', result: '議事録から要約、共有までが完全に自動化され、毎朝の作業が削減', voice: '朝会で決まった決定事項へのアクションにすぐ移れるようになりました', steps: ['Google Meetの文字起こしをGoogleドライブに保存する設定を確認', 'Vertex AI APIを有効化し、認証設定', 'GASで「ドライブの議事録→Geminiで要約→Slack投稿」のフローを作成', 'トリガーを設定して会議後に自動実行', '要約結果がSlackに自動投稿されることを確認'] },
+    { id: 38, cat: 'coding', title: '既存スクリプトをリファクタリングしステップ数3割削減', tools: ['Gemini'], challenge: '既存の請求書自動発行スクリプトは処理手順が多く、一部で手作業が発生していた', solution: '既存スクリプトをGeminiに読み込ませてレビューと改善提案を実施', result: '処理手順を3割削減し、手作業も自動化されて業務効率が向上', voice: '改善点を的確に指摘し、洗練されたコードに書き換えてくれることに驚きました', steps: ['既存スクリプトのコードをコピー', 'Geminiに「このスクリプトをレビューし、改善提案をして」と依頼', '提案された改善点を確認', '「提案を反映したコードを生成して」と指示', '新しいコードをテストして本番適用'] },
+    { id: 39, cat: 'research', title: '海外文献の調査をAIでスピードアップ', tools: ['ChatGPT', 'DeepResearch'], challenge: '海外の法令や指針の調査で、特に英語以外の文献は翻訳に多大な時間がかかった', solution: 'ChatGPTのDeepResearch機能で海外文献調査、自動で日本語要約と原典を取得', result: '翻訳にかかっていた時間が不要になり、海外法令調査が大幅に効率化', voice: 'AIが言語の壁を取り払ってくれたおかげで、業務の質が向上しました', steps: ['調査したい国・分野・キーワードを整理', 'ChatGPTのDeepResearch機能を開く', '「〇〇国の△△に関する法令・指針を調査し、日本語で要約して」と指示', 'AIが複数言語のソースから情報を収集・翻訳', '要約と原典リンクを確認し、必要に応じて深掘り'] },
+    { id: 40, cat: 'design', title: 'Gemini+Copilotでスライド作成を爆速化', tools: ['Gemini', 'GitHub Copilot'], challenge: 'スライド作成が苦手で、時間をかけても満足のいくクオリティが作れなかった', solution: 'Geminiで資料のアウトラインを決定し、GitHub Copilotでスライド内容を生成', result: 'スライド作成が爆速で完了し、クオリティも安定して向上', voice: 'まさに「得意を伸ばし、不得意を補う」AI活用です', steps: ['プレゼンの目的・対象者を整理', 'Geminiに「〇〇についてのプレゼン構成案を作成して」と依頼', '構成案をベースに各スライドの内容を壁打ち', 'Copilotで各スライドの文章・箇条書きを生成', 'スライドツールに転記し、デザインを調整'] },
+    { id: 41, cat: 'data', title: 'NotebookLMで施策振り返り', tools: ['NotebookLM'], challenge: '施策の振り返りをアナリストに依頼すると工数がかかり、タイミングが合わなかった', solution: 'SQL生成や分析要件設計が可能なNotebookLMを作成し、現場が自ら分析できる環境を整備', result: 'アナリスト工数が大幅削減、現場の分析スキル向上という副次効果も', voice: 'データへの理解が深まり、自分たちで施策効果を可視化できるようになりました', steps: ['分析に必要なテーブル定義書をNotebookLMにアップロード', 'サンプルクエリや分析観点もソースとして追加', '「〇〇施策の効果を分析するSQLを作成して」と指示', 'NotebookLMがSQLを生成', '生成されたSQLを実行し、結果を確認'] },
+    { id: 42, cat: 'document', title: 'Gemで告知文章のライティングを標準化', tools: ['Gemini', 'Gem'], challenge: '文章の癖が人によって異なり、ブランドイメージの統一と確認に時間がかかった', solution: 'GeminiのGemで文章の「型」となるプロンプトを設定してチームで共有', result: '文章作成の属人化が解消され、チーム全体で品質が統一、作業効率も大幅向上', voice: '誰でもスピーディーに質の高い文章を作成できるようになりました', steps: ['ブランドトーン・文章ルールを整理', 'Geminiで「Gem」を新規作成', 'システムプロンプトに「あなたは〇〇ブランドのライターです。以下のルールに従って...」と設定', '文章例を含めて精度を高める', 'チームメンバーにGemを共有'] },
+    { id: 43, cat: 'document', title: 'Meetの文字起こしからReadmeを短時間で作成', tools: ['Gemini', 'NotebookLM'], challenge: '開発環境の構築手順をドキュメント化するのに手間と時間がかかっていた', solution: 'Google Meetでの口頭説明を文字起こしし、Geminiでドキュメント化。NotebookLMで詳細を質問可能に', result: '構造化されたドキュメントが一発で完成、作成時間が大幅削減', voice: '双方にとって気持ちの良いコミュニケーションで環境構築が進められました', steps: ['Google Meetで環境構築の説明を録画・文字起こし', '文字起こしデータをGeminiに渡す', '「このやり取りをReadme形式のドキュメントにまとめて」と指示', '生成されたドキュメントをレビュー・編集', 'NotebookLMにアップロードしてQ&A対応可能に'] },
+    { id: 44, cat: 'document', title: '100ページの資料をAIで目次作成・ページ整理', tools: ['Gemini'], challenge: '100ページの資料のページ追加や構成入れ替え時、目次更新が非常に煩雑だった', solution: 'GeminiにPDFを読み込ませ、目次作成とページ入れ替え案を検討・作成', result: '資料全体像の把握がすぐに完了し、編集・整理作業が大幅に効率化', voice: '構成変更やページ入れ替えといったクリエイティブな作業に集中できるようになりました', steps: ['大容量PDFをGeminiにアップロード', '「この資料の目次を作成して」と指示', '生成された目次で全体構成を把握', '「〇〇セクションと△△セクションの順序を入れ替える提案をして」と依頼', '提案を参考に資料を編集'] },
+    { id: 45, cat: 'planning', title: 'アイデアを1日でプロトタイプ化', tools: ['Gemini', 'GitHub Copilot'], challenge: '企画案からプロトタイプ開発の仕様作成に時間がかかり、アイデアの鮮度が落ちていた', solution: '企画案を入力すると仕様概要を自動出力するプロンプトを作成、1日でバイブコーディング', result: 'アイデアからプロトタイプまでのリードタイムがかなり短縮', voice: '思いついた熱量のまま、プロトタイプ開発ができるのは便利', steps: ['アイデアを箇条書きで整理', 'Geminiに「このアイデアの機能仕様書を作成して」と依頼', '仕様書をベースにGitHub Copilotでコーディング', '「この機能を実装して」と対話しながら開発', '1日でプロトタイプを完成'] },
+    { id: 46, cat: 'data', title: '人事異動データの整理をAIでミスなく時間短縮', tools: ['Gemini'], challenge: 'データ整理の前に読み解くことに時間がかかり、人為的ミスも多かった', solution: 'Geminiにデータを読み込ませ、グループ化・期間結合・並び替え等を自動化', result: 'データを読み解く時間が大幅削減され、ミスも減少', voice: '本来注力すべき資料の中身の作成に集中できるようになりました', steps: ['異動データをCSVまたはスプレッドシートで準備', 'Geminiにデータをアップロード', '「このデータを部署別にグループ化し、期間で並び替えて」と指示', 'AIが整理されたデータを出力', '結果を確認し、資料作成に活用'] },
+    { id: 47, cat: 'meeting', title: '過去の議事録から議論の抜け漏れや課題を抽出', tools: ['Gemini'], challenge: 'MTGで議論が白熱すると、議論観点に抜け漏れが発生することがあった', solution: 'Geminiに会議情報を提供し、次回MTGで議論すべきこと・見落としリスクをまとめる', result: '議論点の見落としを客観的に洗い出し、アジェンダをより良くできた', voice: '過去の議事録を遡る作業が、すぐに要点をまとめられるようになりました！', steps: ['過去数回分の議事録を収集', 'Geminiに議事録をアップロード', '「これらの議事録から未解決の課題と次回議論すべき点を抽出して」と指示', 'AIが抜け漏れリスクと推奨アジェンダを生成', '次回会議のアジェンダに反映'] },
+    { id: 48, cat: 'learning', title: '24時間365日対応のセキュリティ相談AIチャット', tools: ['NotebookLM'], challenge: '初歩的な疑問に「誰に何を聞けばいいか」分からず、社内規程から情報を探すのが大変だった', solution: '社内規程をチューニングして学習した「セキュリティ相談AIチャット」を公開', result: 'ちょっとした疑問が即座に案内され、複雑な相談も論点が整理されて問合せがスムーズに', voice: '「まずAIに聞く習慣ができた」「資料を探す手間がゼロになった！」と好評です', steps: ['社内セキュリティ規程・ガイドラインを収集', 'NotebookLMにすべてのドキュメントをアップロード', 'よくある質問と回答例をテストして精度を確認', '必要に応じてソースを追加・調整', 'NotebookLMの共有リンクを社内展開'] },
+    { id: 49, cat: 'automation', title: 'LLMで単純作業を自動化＆イレギュラーにも対応', tools: ['ChatGPT'], challenge: 'ワークフロー申請で定型作業が多いが、イレギュラー対応も必要で完全自動化は困難だった', solution: 'LLM（ChatGPT 4.1）を組み込んだ自動化ツールを開発、イレギュラーにも柔軟に対応', result: '人間が行っていた作業の大部分をAIに任せ、業務効率が大幅向上', voice: 'これまで諦めていた業務の自動化が可能になりました', steps: ['自動化対象のワークフローを整理', 'ChatGPT APIを取得', 'Zapier/Make等の自動化ツールでワークフローを構築', 'LLMノードを追加し、イレギュラー判定ロジックを設定', 'テスト実行して精度を確認、本番運用開始'] },
+    { id: 50, cat: 'data', title: 'Deep Researchでイベントアンケート分析', tools: ['Gemini', 'DeepResearch'], challenge: '数値や傾向が何を示すか言語化するには分析力とドメイン知識が必要だった', solution: 'アンケート集計結果とイベント概要をGeminiに読み込ませ、Deep Researchで分析', result: '分析観点の洗い出しとレポート作成までAIが行い、非常に効率的に', voice: 'イベントの課題や伸長ポイントを短時間で洗い出し、アクション提案を即時に共有できました', steps: ['アンケート集計結果をCSVまたはスプレッドシートで準備', 'イベント概要資料も用意', 'Gemini Deep Researchにデータをアップロード', '「このアンケート結果を分析し、課題と改善提案をまとめて」と指示', '分析レポートを確認し、関係者に共有'] },
+    { id: 51, cat: 'coding', title: 'AIがリポジトリの案内人に', tools: ['GitHub Copilot'], challenge: '初めて触る大規模なコードリポジトリの全体像把握に時間がかかっていた', solution: 'GitHub Copilotにリポジトリ概要を説明させたり、処理の場所を質問', result: 'リポジトリの構造や主要処理を短時間でキャッチアップできるようになった', voice: '新しい技術やプロダクトへのキャッチアップが格段に楽になりました', steps: ['VS CodeでGitHub Copilot Chat有効化', 'リポジトリを開く', 'Copilot Chatに「このリポジトリの全体構成を説明して」と質問', '「〇〇の処理はどこにある？」等で具体的な場所を特定', '関連ファイルを開きながら理解を深める'] },
+    { id: 52, cat: 'meeting', title: 'AIアシスタントがチームの創造性を解放', tools: ['AI'], challenge: '進捗報告に時間がかかり議論時間が不足、アジェンダ作成やコピペ地獄に悩んでいた', solution: '定型業務をAIに任せ、人間は議論・アイデア創出・意思決定に集中', result: '会議は「報告の場」から「創造の場」へ。準備から事後処理までAIが支援', voice: '毎週の定例準備がほぼゼロになり、戦略的な議論に時間を使えるようになりました', steps: ['会議の定型作業を洗い出し（アジェンダ作成、議事録作成等）', '各作業に適したAIツールを選定', 'アジェンダ自動作成、議事録自動生成の仕組みを構築', '会議時間を「議論・意思決定」に集中', '事後処理もAIで自動化'] },
+    { id: 53, cat: 'document', title: '50枚超のスライドの誤字脱字チェックを数分で', tools: ['Gemini', 'Gem'], challenge: '50枚以上のスライドを複数人で目視確認しており、時間がかかり見落としもあった', solution: 'チェック観点をGeminiに伝えスライド校正用Gemを作成、固有名詞のファクトチェックも可能に', result: '数人がかりで数時間かかっていたチェックが数分で完了、品質も安定', voice: 'ドライブからスライドを選ぶだけで統一されたアウトプットが得られ助かりました', steps: ['校正ルール（表記統一、NG表現等）を整理', 'GeminiでGemを新規作成', 'システムプロンプトに校正ルールを設定', 'Googleドライブ連携でスライドを選択', 'AIが誤字脱字・表記揺れを検出してリストアップ'] },
+    { id: 54, cat: 'design', title: '手書きメモをFigma/draw.ioで編集可能な形式に変換', tools: ['Gemini', 'Figma'], challenge: '手書きのワイヤーフレームやフロー図をFigmaで清書し直すのは二度手間だった', solution: '手書きメモの写真をGeminiに渡し、Figmaやdraw.ioで編集可能なデータ形式に変換', result: '手書きからPC上で継続編集できるようになり、アイデアを形にするスピードが向上', voice: '思考を止めずに、シームレスに資料化することが可能です', steps: ['手書きのワイヤーフレームやフロー図を撮影', 'Geminiに画像をアップロード', '「このフロー図をMermaid記法で出力して」または「SVGで出力して」と指示', '出力されたコードをdraw.ioやFigmaにインポート', 'デジタル上で編集を継続'] },
+    { id: 55, cat: 'automation', title: 'Gemini CLIでGitHub Issueの確認を効率化', tools: ['Gemini CLI'], challenge: 'GitHubのissueが増えると、更新漏れや今日やるべきタスクの把握が大変だった', solution: 'Gemini CLIにghコマンドを実行させ、自然言語でタスク状況を確認できるように', result: '毎日のタスク確認が対話形式で簡単になり、見落としが減った', voice: 'コマンドラインからAIに話しかけるだけでタスク状況がわかり、非常にスムーズです', steps: ['Gemini CLIをインストール', 'GitHub CLIも設定済みであることを確認', 'ターミナルでGemini CLIを起動', '「今日対応すべきissueを教えて」と自然言語で質問', 'AIがghコマンドを実行し、結果を整理して回答'] },
+    { id: 56, cat: 'research', title: '視察出張プランをAIと作成', tools: ['Gemini', 'NotebookLM'], challenge: '視察出張のリサーチやプランニングに多くの時間がかかり、特に海外情報収集は大変だった', solution: 'Geminiで視察地域の概要・スポット候補を洗い出し、NotebookLMに文献を読み込ませてポイントをまとめる', result: '現地での視察がスムーズになり、帰国後の報告書作成も捗った', voice: 'ポイントを絞って効率的に見て回れ、移動中にも音声で予習できて大変便利でした', steps: ['視察の目的・テーマを整理', 'Geminiに「〇〇地域の△△に関する視察スポット候補を挙げて」と依頼', '候補から訪問先を選定', '関連文献をNotebookLMにアップロードし、音声概要を生成', '移動中に音声で予習し、効率的に視察'] },
+    { id: 57, cat: 'learning', title: 'GeminiをパーソナルトレーナーにしてFigma学習', tools: ['Gemini'], challenge: 'AI生成画像は微調整が必要で、デザインツールを学習して自分で作りたかった', solution: 'Geminiに「1週間のFigma集中学習スケジュール」を作成してもらい、それに沿って学習', result: '既存LPのKV差し替えやボタン新規作成を自分で対応できるようになった', voice: '体系的にFigmaを学べ、企画の立案から実行までのスピード感が上がりました', steps: ['学習目標を明確化（例：LPのKV差し替えができるようになる）', 'Geminiに「Figma初心者が1週間で〇〇できるようになる学習スケジュールを作成して」と依頼', '生成されたスケジュールに沿って毎日学習', '不明点はGeminiに質問しながら進める', '最終日に実際のタスクで成果を確認'] },
+    { id: 58, cat: 'document', title: '新旧PDF文書を比較し新旧対照表を一発生成', tools: ['Gemini'], challenge: '社内規程改定時の新旧対照表作成が手間で、ミスも発生しがちだった', solution: '変更前後のPDFをGeminiに読み込ませ「変更箇所を抽出し新旧対照表として出力」と指示', result: '一覧化作業が一瞬で完了し、大幅な効率化とミス軽減を実現', voice: 'PDFを読み込ませるだけで正確な新旧対照表が出来上がり、大変効率的でした', steps: ['改定前と改定後のPDFを準備', 'Geminiに両方のPDFをアップロード', '「この2つのPDFの変更箇所を抽出し、新旧対照表を作成して」と指示', 'AIが差分を検出し、表形式で出力', '内容を確認し、社内共有用に整形'] },
+    { id: 59, cat: 'data', title: 'クラスター分析結果の解釈とネーミングを自動提案', tools: ['Gemini', 'ChatGPT'], challenge: 'クラスター分析後の解釈とネーミングは熟練者でも時間がかかる工程だった', solution: '分析結果の数表をそのまま生成AIに読み込ませ、各グループの解釈とネーミングを依頼', result: 'AIの提案はほぼそのまま使えるレベルで、レポート作成工数が削減、質も向上', voice: 'ウンウン唸りながら考えていたネーミングを、AIが的確に提案してくれます', steps: ['クラスター分析結果（各クラスターの特徴量）をCSVで出力', 'Geminiまたは ChatGPTにデータをアップロード', '「各クラスターの特徴を解釈し、分かりやすいネーミングを提案して」と指示', 'AIが各クラスターの解釈と名前を提案', '提案を確認し、レポートに反映'] },
+    { id: 60, cat: 'automation', title: 'GASでトレンド分析から調査プロンプト生成まで自動化', tools: ['Gemini', 'GAS', 'DeepResearch'], challenge: 'トレンド把握のためのWeb記事収集・分析からアイディア発見まで、手動では膨大な時間がかかった', solution: 'GASでWeb記事収集→頻出ワード抽出→Deep Research用プロンプト自動生成を自動化', result: '再現性のあるアイディア創出プロセスを仕組み化、リサーチの質とスピードが大幅向上', voice: 'より客観的で質の高いアイディア創出につながっています', steps: ['RSSフィードやニュースAPIでWeb記事を収集するGASを作成', '収集した記事から頻出キーワードを抽出する処理を追加', 'キーワードからDeep Research用プロンプトを自動生成', '生成されたプロンプトでDeep Researchを実行', '結果をスプレッドシートに蓄積して分析'] },
+    { id: 61, cat: 'automation', title: 'GAS未経験者が工数管理ツールをAIと作成', tools: ['ChatGPT', 'GAS'], challenge: '業務カテゴリごとの時間把握をしたかったが、非エンジニアで自分でツールが作れなかった', solution: 'ChatGPTに助けてもらいながらGoogleカレンダーから情報を抽出するGASを作成', result: 'ボタンを押すだけで業務時間の可視化ができるツールが完成', voice: 'GASを書いたことがなくても、エラーを見せて相談すれば修正できるので諦めずに完成できました！', steps: ['実現したい機能を整理（カレンダーから予定を取得、カテゴリ別に集計等）', 'ChatGPTに「Googleカレンダーの予定をカテゴリ別に集計するGASを作成して」と依頼', '生成されたコードをApps Scriptに貼り付け', 'エラーが出たらエラーメッセージをChatGPTに伝えて修正', '動作確認し、ボタンで実行できるように設定'] },
+    { id: 62, cat: 'automation', title: 'メールの重要度仕分けとサマリ通知で工数削減', tools: ['Gemini', 'GAS'], challenge: '毎日大量のメール確認に工数がかかり、見落としリスクもあった', solution: 'GeminiとGASで受信メールを重要度別に仕分けし、サマリを通知するスクリプトを作成', result: '朝夕にメール全体をざっと確認でき、見落としリスクと確認工数が大幅削減', voice: 'メール見落としのリスクと確認工数がかなり削減しました', steps: ['重要度判定の基準を整理（送信者、件名キーワード等）', 'Geminiに「Gmailの受信メールを重要度別に仕分けするGASを作成して」と依頼', 'Gemini APIを使った重要度判定ロジックを追加', '朝夕にサマリをSlackやメールで通知する処理を追加', 'トリガーを設定して自動実行'] },
+    { id: 63, cat: 'design', title: 'ブランドのトンマナに沿った配色パターンをAIで出力', tools: ['Cursor'], challenge: 'ブランドのトンマナに沿った配色を考える際、多くのパターンを試作するのが手間だった', solution: 'Cursorで指定した条件でカラーコードの組み合わせを複数パターン生成', result: '多くの配色パターンを迅速に比較検証でき、デザインの意思決定が効率化', voice: 'クリエイティブな比較検証作業に集中できるようになりました', steps: ['ブランドカラーと配色ルール（コントラスト比等）を整理', 'Cursorで「以下の条件に合う配色パターンを10個生成して」と指示', 'AIがカラーコードの組み合わせを複数提案', 'プレビューして比較検討', '最適なパターンを採用'] },
+    { id: 64, cat: 'meeting', title: 'AI議事録活用でレビューの質・速度を3倍に改善', tools: ['Google Meet', 'Gemini'], challenge: 'コメント機能でのレビューはコンテキストが伝わらず、何度もやり取りが発生した', solution: 'Google MeetのAI議事録で30分間直接会話してレビュー、議事録をGeminiで深掘り', result: '同じ30分でレビュー結果＋議事録＋Geminiによる添削という「3倍」のアウトプットが得られる', voice: 'この3倍のアウトプットがよりクリエイティブなアウトカムにつながることを体感しています', steps: ['Google Meetで文字起こしを有効にしてレビュー会議を実施', '30分間で口頭でレビューを実施', '会議終了後、自動生成された議事録を取得', 'Geminiに議事録を渡し「指摘事項を整理して」と指示', 'さらに「追加の改善提案をして」で深掘り'] },
+    { id: 65, cat: 'learning', title: 'Jiraチケットをまとめて振り返り資料のドラフト作成', tools: ['Claude Code', 'Atlassian MCP'], challenge: '半期ごとの個人振り返りは初期の記憶が曖昧で、後回しにしがちだった', solution: 'Claude CodeとAtlassian MCPで半期中のJiraチケットをまとめ、振り返り資料のドラフトを作成', result: 'ドラフトがあることで振り返り資料の作成が大幅に効率化', voice: '振り返りに着手しやすくなり、より本質的な内容に向き合う時間を増やせました', steps: ['Claude CodeにAtlassian MCPを設定', '「過去6ヶ月間の自分のJiraチケットを取得して」と指示', 'AIがチケット一覧を取得', '「この実績をもとに振り返り資料のドラフトを作成して」と依頼', 'ドラフトを確認・編集して完成'] },
+    { id: 66, cat: 'automation', title: 'プラットフォーム規約や海外法令の変更を自動通知', tools: ['ChatGPT', 'Gemini'], challenge: '業界レギュレーションや法令は不定期に更新され、自力で情報を追うのは大きな負担だった', solution: 'ChatGPTやGeminiに定期タスクを実行させ、特定Webサイトの変更を監視', result: '変更時にAIから通知が来る仕組みで、情報収集・整理の手間が90%軽減', voice: '重要な規約変更を見落とすリスクを減らしつつ、調査時間を大幅に削減できました', steps: ['監視対象のWebページURLを整理', 'GASでページ内容を定期取得するスクリプトを作成', '前回取得内容との差分を検出する処理を追加', '差分があればAIで要約してSlack通知', 'トリガーを設定して毎日自動実行'] },
+    { id: 67, cat: 'research', title: '音声解説→レポート熟読でトピック理解を高速化', tools: ['Gemini', 'NotebookLM', 'DeepResearch'], challenge: '新しいトピックの情報収集と深い理解に時間がかかっていた', solution: 'Deep Researchで日英両方で調査→NotebookLMで音声解説を生成→音声を聞いてからレポートを読む', result: '音声で概要を掴んでから詳細を読むことで、理解がより早く深くなった', voice: '日英両方でリサーチし、音声とテキストを組み合わせることで、インプットの質と速度が劇的に上がりました', steps: ['調査テーマを決定', 'Deep Researchで日本語・英語両方で調査を実行', '生成されたレポートをNotebookLMにアップロード', 'Audio Overview機能で音声解説を生成', '音声を聴いて概要を掴んでからレポートを精読'] },
+    { id: 68, cat: 'design', title: 'アイコンパターンを量産生成しデザインプロセス革新', tools: ['Gemini'], challenge: 'アイコンデザインで微細な違いのパターンを多数試作するには時間と労力が必要だった', solution: 'Geminiを活用してSVG形式でアイコンの組み合わせパターンを大量生成するプログラムを作成', result: '10000パターンを生成して方向性を決め、微調整を繰り返す新しいデザインプロセスが実現', voice: '試行錯誤の量と質が劇的に向上し、これまでにないデザインプロセスを体験できました', steps: ['アイコンの構成要素（形、色、サイズ等）を定義', 'Geminiに「SVG形式でアイコンのバリエーションを生成するPythonスクリプトを作成して」と依頼', 'パラメータを変えながら大量のパターンを生成', '生成されたアイコンを一覧表示して比較', '良いパターンを選定し、微調整して完成'] },
+    { id: 69, cat: 'coding', title: 'DevinとSlack連携でBizチームが直接PR作成', tools: ['Devin', 'Slack'], challenge: 'リダイレクト先URL変更など、都度エンジニアが対応する必要があり工数がかかっていた', solution: 'DevinをSlackと連携させ、Bizチームが遷移先を指定するだけでPRを自動作成', result: 'エンジニアが対応していた定型業務をBizチームで完結できるようになった', voice: 'エンジニア・ビジネス双方の業務効率が大幅に改善しました', steps: ['DevinにGitHubリポジトリへのアクセス権限を付与', 'DevinをSlackワークスペースに追加', 'Slackチャンネルで「@Devin 〇〇のリダイレクト先を△△に変更して」とメンション', 'DevinがPRを自動作成しSlackに通知', 'エンジニアがPRをレビューしてマージ'] },
+    { id: 70, cat: 'research', title: '調査データから「対話できるペルソナ」を生成', tools: ['Gemini', 'Gem'], challenge: 'ペルソナシートは情報量が限られ、人格表現に限界があり活用されにくかった', solution: '調査データをGeminiにコンテキストとして与え、「対話可能な人工人格」としてのペルソナを生成、Gemで共有', result: 'ユーザーに直接相談する感覚でペルソナを活用でき、的確な情報やアイデアが得られるように', voice: '実際の調査データに基づかせたのが肝。リアルなインサイトを親近感を持って活用できるようになりました', steps: ['ユーザー調査データ（インタビュー記録、アンケート結果等）を収集', 'GeminiでGemを新規作成', 'システムプロンプトに「あなたは以下の調査データに基づくペルソナです...」と設定', '調査データの詳細をコンテキストとして追加', 'Gemを共有し、チームがペルソナと対話可能に'] },
+    { id: 71, cat: 'design', title: '既存CSSとスクショからデザイン修正コードを即生成', tools: ['Gemini'], challenge: 'CSS修正で正確な変更箇所を見つけて記述するのに時間がかかっていた', solution: 'Geminiに既存CSSとデザインのスクショを渡し、変更内容をプロンプトで指示', result: 'AIが指示と画像を理解し、求めるデザインのCSS修正コードを具体的に生成', voice: '既存コードとビジュアルを両方インプットできるので、認識齟齬が減り精度の高い修正が可能に', steps: ['既存のCSSファイルを準備', '修正後のデザインイメージのスクリーンショットを撮影', 'Geminiに両方をアップロード', '「このCSSを、スクショのデザインに合わせて修正して」と指示', '生成されたCSSを適用してプレビュー確認'] },
+    { id: 72, cat: 'document', title: 'スプレッドシートのTODOから週報を自動作成', tools: ['Gemini'], challenge: 'TODOリストから完了タスクを抽出し報告資料にまとめる作業に時間がかかっていた', solution: 'Geminiで指定期間内に「done」になったタスクを自動ピックアップし、報告形式に出力', result: '報告資料のたたき台作成時間が大幅に短縮', voice: '面倒なタスクの書き出しや整理をAIに任せることで、報告業務の負担が大きく減りました', steps: ['スプレッドシートのTODOリストを準備（ステータス列あり）', 'Geminiにスプレッドシートのリンクまたはコピーを渡す', '「今週doneになったタスクを抽出し、週報形式でまとめて」と指示', 'AIが完了タスクを抽出し、週報形式で出力', '内容を確認し、必要に応じて編集'] },
+    { id: 73, cat: 'document', title: 'Cursorで文章作成・修正を快適に', tools: ['Cursor'], challenge: 'より丁寧な表現を検討したり、スムーズに文書作成したいニーズがあった', solution: 'エンジニア向けと思われがちなCursorを日常の文書作成（.mdファイル）に活用', result: '文章の推敲をAIサポートで効率化。デザイナーでも使いやすいツールとして定着', voice: '普段コーディングをしない職種の人でも、ドキュメントツールとしてぜひ試してみて欲しいです！', steps: ['Cursorをインストール', '.mdファイルを新規作成', '文章を書き始め、推敲したい箇所を選択', 'Cmd+K（Ctrl+K）で「より丁寧な表現に」等の指示', 'AIの提案を確認し、採用するか選択'] },
+    { id: 74, cat: 'document', title: 'インタビュー議事録から外部公開文書作成', tools: ['Gemini', 'Canvas'], challenge: 'インタビュー議事録を表現・構成・文字数を適正にした外部公開用文書にする必要があった', solution: 'Gemで作ったドラフトをCanvasで強弱調整・表現変更・文字数調整してブラッシュアップ', result: '制約とルールのある外部公開文書作成が効率化', voice: 'ドラフトを瞬時に作成、「もっとこうして」にも即時対応。もうGeminiなしには戻れません！', steps: ['インタビュー議事録を用意', 'Gemini Gemに「この議事録を〇〇向け記事にまとめて」と依頼', '生成されたドラフトをGemini Canvasで開く', 'Canvas上で「もっと簡潔に」「文字数を〇〇字に」等の調整', 'ブラッシュアップを繰り返して完成'] },
+    { id: 75, cat: 'coding', title: '最新ライブラリを迅速キャッチアップ', tools: ['Cursor', 'Claude Code'], challenge: 'LangChainなど変化の速い最新ライブラリの情報を素早くキャッチアップするのが困難だった', solution: 'DeepWikiで対話的に実装方法を確認、コーディング時はContext7 MCPで最新ドキュメントを参照', result: '最新ライブラリ情報を迅速にキャッチアップし、開発への組み込みが素早く行えるようになった', voice: 'AIのサポートで最新技術情報にも効率よく対応でき、開発の幅が広がりました', steps: ['DeepWikiで対象ライブラリのページを開く', '「〇〇の実装方法を教えて」と対話形式で質問', 'Context7 MCPをCursorまたはClaude Codeに設定', 'コーディング中に最新ドキュメントを自動参照', '最新のベストプラクティスに沿った実装を進める'] },
+    { id: 76, cat: 'design', title: 'Gemini Canvasで会社テンプレ準拠のスライド生成', tools: ['Gemini', 'Canvas'], challenge: '社内標準テンプレートに沿ったスライド作成に構成検討とデザイン調整で時間がかかった', solution: 'GeminiのCanvas機能で対話しながらアウトラインを決め、テンプレートに沿ったスライドを自動生成', result: 'コーディングやデザイン調整不要でたたき台が短時間で完成、初速が劇的に向上', voice: 'Geminiと壁打ちしているうちに構成と思考が整理され、スライドとしてアウトプットされる体験は革命的です', steps: ['プレゼンの目的・対象者を整理', 'Geminiに「〇〇のプレゼン構成を考えて」と依頼', 'Canvas機能で対話しながらアウトラインを詰める', '「この構成でスライドを生成して」と指示', '生成されたスライドを確認し、テンプレートに移植'] },
+    { id: 77, cat: 'learning', title: 'AI音声概要で勉強会の発表準備負荷ゼロ', tools: ['NotebookLM'], challenge: '勉強会は有益だが、発表者の資料準備や登壇準備の負荷が大きく継続が難しかった', solution: 'NotebookLMに関連資料を登録し、生成した「音声概要」を勉強会のコンテンツとして使用', result: '発表者の準備負荷がほぼゼロになり、議論の時間を取ることでアクティブな勉強会を開催できた', voice: '音声を聞くだけでインプットでき、開催のハードルが劇的に下がりました', steps: ['勉強会テーマに関連する資料を収集', 'NotebookLMに資料をアップロード', 'Audio Overview機能で音声概要を生成', '勉強会で音声を再生し、参加者と共有', '音声を聴いた後、議論やQ&Aの時間を設ける'] },
+    { id: 78, cat: 'design', title: 'Figma Makeでリッチなインタラクションを爆速試作', tools: ['Figma Make'], challenge: '従来のFigmaプロトタイプ機能ではリッチなインタラクションを表現しきれず、エンジニアとの共有が難しかった', solution: 'Figma Makeで高度なインタラクションを含むプロトタイプを作成', result: 'リッチなインタラクションをスピーディに試せ、コードベースのアウトプットでエンジニアとの議論がスムーズに', voice: 'デザインの意図を正確に伝えられ、グラフィック面での試行錯誤のスピードも格段に上がりました', steps: ['Figmaでデザインを準備', 'Figma Makeプラグインを有効化', '「このデザインに〇〇のインタラクションを追加して」と指示', 'AIがコードベースでインタラクションを生成', 'プレビューで動作確認し、エンジニアと共有'] },
+    { id: 79, cat: 'learning', title: 'GeminiをAIパーソナルトレーナーにして健康管理', tools: ['Gemini', 'Gem'], challenge: '筋トレや減量を自己流で行っていたが、専門知識がなくモチベーション維持も難しかった', solution: 'GeminiのGemで自分専用の「パーソナルトレーナー人格」を作成、メニューやPFCバランス、体脂肪率判定まで任せる', result: '5ヶ月で体重8kg減、体脂肪率9%減を達成。コンテストコンディションまで到達', voice: '些細な疑問や減量中のメンタルケアまでAIがサポートしてくれ、解像度が格段に上がりました', steps: ['目標（減量、筋肥大等）を明確化', 'GeminiでGemを新規作成', 'システムプロンプトに「あなたはパーソナルトレーナーです。私の目標は...」と設定', '毎日の食事・トレーニングを報告し、フィードバックを受ける', '定期的に進捗を確認し、メニューを調整'] },
+    { id: 80, cat: 'security', title: 'PacketProxyでAIエージェントの動作を計測・理解', tools: ['Gemini CLI', 'PacketProxy'], challenge: 'AIエージェントの内部でどのような情報がやり取りされているかブラックボックスで「なんとなく」使われがちだった', solution: '自社OSSのPacketProxyでGemini CLIの通信内容を解析し、コンテキストの扱い方を「計測」して解明', result: 'AIエージェントの動作原理を計測に基づいて理解でき、記事として寄稿', voice: '「なんとなく」で使っていたAIエージェントを、自信を持ってビジネスに組み込めるようになりました', steps: ['PacketProxy（OSSプロキシツール）をインストール', 'Gemini CLIの通信をPacketProxy経由に設定', 'AIエージェントを実行し、通信内容をキャプチャ', 'リクエスト/レスポンスの内容を分析', 'コンテキストの扱い方やトークン消費を可視化'] },
+    { id: 81, cat: 'automation', title: '5分でDiffツール作成', tools: ['Gemini', 'GAS'], challenge: 'スプレッドシートの仕様書で「前とどう変わった？」を目視で追うとミスも増え工数がかかっていた', solution: 'Geminiでスプレッドシートの差分を抽出する「Diffツール」を5分で作成', result: '変更箇所が一目でわかり、レビュー効率が劇的UP、変更漏れ・確認ミスも防止', voice: 'AIにDiffツールを作ってもらい、変更箇所の確認がミスなく高速に行えるようになりました', steps: ['Geminiに「スプレッドシートの2つのシートの差分を検出するGASを作成して」と依頼', '生成されたコードをApps Scriptに貼り付け', '比較対象のシート名を設定', 'スクリプトを実行', '差分がハイライトされた結果を確認'] },
+    { id: 82, cat: 'research', title: '「プロンプトレビュー用プロンプト」で精度向上', tools: ['Gemini'], challenge: '生成AIの回答の質はプロンプトに左右されるが、常に最適なプロンプトを作成するのは難しかった', solution: 'Geminiに「プロンプトの品質をレビューし改善案を提示する」メタ的なプロンプトを作成し、Gemとして登録', result: 'プロンプト品質の向上と、自分のプロンプトエンジニアリング能力向上にも繋がった', voice: '「AIによるAI改善」が簡単にでき、AIのポテンシャルを最大限に引き出せます', steps: ['GeminiでGemを新規作成', 'システムプロンプトに「ユーザーが入力したプロンプトをレビューし、改善案を提示してください」と設定', 'レビュー観点（明確さ、具体性、制約条件等）を追加', '作成したプロンプトをGemに入力', '改善提案を参考にプロンプトをブラッシュアップ'] },
+    { id: 83, cat: 'data', title: 'DifyベースでLLM定性分析基盤を構築', tools: ['Dify', 'Gemini', 'Claude'], challenge: 'SNSだけでは発信力のある人の意見に偏り、サービス内の多様なユーザーの声を網羅的に把握できなかった', solution: 'Difyベースの分析基盤を作成し、サービス内情報をLLMに取り込み定性的な反応を自動集計', result: '多様な情報を低工数で迅速に把握でき、施策の評価と改善サイクルが格段にアップ', voice: 'ユーザーのリアルな反応を効率的に集計・分析でき、施策の手応えを多角的に掴めるようになりました', steps: ['Difyでワークフローを新規作成', 'サービス内のユーザーフィードバックを取得するAPIを接続', 'LLMノードを追加し、フィードバックの分類・要約プロンプトを設定', '定期実行トリガーを設定', '分析結果をダッシュボードに出力'] },
+    { id: 84, cat: 'coding', title: 'UnityでFBXインポートの作業を自動化', tools: ['Gemini'], challenge: 'UnityでFBXファイルのインポート時、フォルダ振り分け・マテリアル割当・プレハブ化の定型作業が手間だった', solution: 'Geminiに自動化したいフローを箇条書きで指示し、AIと壁打ちしながらスクリプトを作成', result: '面倒なインポート作業を自動化するスクリプトが完成し、作業効率が大幅向上', voice: 'やりたいことを箇条書きにするだけでAIが壁打ち相手になり、実装方法もサポートしてくれました', steps: ['自動化したい作業フローを箇条書きで整理', 'Geminiに「UnityでFBXインポートを自動化するEditor拡張スクリプトを作成して」と依頼', '生成されたC#スクリプトを確認', 'Unityプロジェクトにスクリプトを配置', 'メニューから実行して動作確認'] },
+    { id: 85, cat: 'meeting', title: 'AIで問合せ対応を自動化', tools: ['Slack', 'Findout'], challenge: '従来のWebチケットシステムは問合せ対応に時間がかかり、担当者工数が増加していた', solution: 'Slackを問合せ窓口とし「まずAIに聞いて、分からなかったら人が対応」するAIネイティブな流れを構築', result: 'AIによる即時回答で多くの問合せがその場で完結、チケット件数20%減、解決時間40%短縮', voice: 'AIが最初に回答することで基本的な質問が減り、専門性を活かした対応に注力できています', steps: ['社内ナレッジベースをAIに学習させる', 'Slackボット（Findout等）を設定', '問合せチャンネルでボットをメンションすると自動回答', 'AIが回答できない場合は担当者にエスカレーション', '回答精度を確認しながらナレッジを追加'] },
+    { id: 86, cat: 'learning', title: 'サウンドの「事故例」をAI動画で再現し研修に活用', tools: ['Gemini'], challenge: '新卒研修で「サウンドと映像のズレ」の事故例を伝えたかったが、実際のプロジェクト動画は機密情報で使用不可だった', solution: 'Geminiの画像・動画生成機能でデモ画像・動画を作成し、意図的にサウンドをずらして事故例を再現', result: '口頭では伝わりにくかった「事故」を実物で見せることで、研修受講者の理解が深まった', voice: '「事故例を見て、サウンドに連絡する重要性がわかりました」とコメントがあり、研修の質を高めることができました', steps: ['再現したい事故のシナリオを整理', 'Geminiに「〇〇のシーンのデモ画像を生成して」と依頼', '生成された画像から動画を作成', '動画編集ソフトでサウンドを意図的にずらす', '研修で事故例として提示し、解説'] },
+    { id: 87, cat: 'coding', title: 'Photoshop自動化のJSXコーディングをAIが解決', tools: ['Gemini', 'ChatGPT'], challenge: 'Photoshop自動化のExtendScript(JSX)は日本語文献が少なく、扱えるエンジニアも限られ自動化のハードルが高かった', solution: 'GeminiやChatGPTに自然言語で指示し、JSXのコードを生成', result: 'ニッチな分野でもAIがコーディングをサポートし、Photoshopの定型作業を自動化する目処が立った', voice: 'マイナーな技術領域でもAIに相談すればコードを書いてくれることに驚きました', steps: ['自動化したい処理を言語化（例：全レイヤーをPNG書き出し）', 'GeminiまたはChatGPTに「PhotoshopのExtendScriptで〇〇するコードを作成して」と依頼', '生成されたJSXコードを確認', 'Photoshopの「ファイル」→「スクリプト」→「参照」で実行', '動作を確認し、必要に応じて修正'] },
+    { id: 88, cat: 'research', title: 'Slack常駐AIが仕様書検索やログ要約を代行', tools: ['Gemini API', 'Slack'], challenge: 'プロジェクトが長くなるにつれて仕様書・議事録・コードが膨大になり、検索コストが高くなっていた', solution: 'Gemini APIでSlackに常駐するAIエージェントを開発、Confluence仕様書検索や議事録要約などに対応', result: '情報検索の時間が大幅短縮、AIに聞けばSlack上で必要な情報が手に入るように', voice: '「あの仕様どうだっけ？」とメンションするだけで答えてくれ、チームに欠かせない一員です', steps: ['Gemini APIキーを取得', 'Slackボットを作成し、Gemini APIと連携', 'Confluence APIも連携して仕様書検索を可能に', 'ボットにメンションで質問すると回答を生成', '継続的にナレッジソースを追加して精度向上'] },
+    { id: 89, cat: 'research', title: 'アセットモチーフの参考事例収集をAIで', tools: ['Gemini', 'Gem'], challenge: 'デザインアセットのモチーフを検討する際、利用可能かどうかの調査・判断に専門知識と時間が必要だった', solution: 'Geminiで「条件にヒットするモチーフを検索」「利用可能条件にマッチするか診断」するGemを作成しチームで共有', result: 'モチーフ選定の初期段階でAIによるリスクスクリーニングが可能になり、手戻りリスクを低減', voice: 'ナレッジとしてチームで誰でも利用でき、属人化せずにモチーフ検討ができるようになりました', steps: ['モチーフ選定の判断基準（著作権、商標等）を整理', 'GeminiでGemを新規作成', 'システムプロンプトに判断基準と検索ロジックを設定', 'モチーフ候補を入力すると利用可否を判定', 'チームで共有して活用'] },
+    { id: 90, cat: 'data', title: 'スプレッドシートの大改修をGASで一括対応', tools: ['Gemini', 'GAS'], challenge: '複数ファイルを管理するスプレッドシートの全シートに一括で修正を行う必要があったが、手作業では膨大な時間がかかった', solution: 'Geminiに全シートを横断して修正を実行するGASを作成させる', result: '手作業なら数日かかる大規模改修が一瞬で完了し、管理シートの利便性が向上', voice: '何十枚・何千レコードのシートを一つ一つ手で直すことを考えると気が遠くなりそうでしたが、AIで一発で終わり大変効率的でした！', steps: ['修正内容を整理（列追加、値変換等）', 'Geminiに「複数のスプレッドシートの全シートに対して〇〇を実行するGASを作成して」と依頼', '生成されたコードをApps Scriptに貼り付け', '対象ファイルIDを設定', 'スクリプトを実行して一括修正'] },
+    { id: 91, cat: 'document', title: 'Notion連携でPRD/機能仕様書作成フロー構築', tools: ['Cursor', 'Notion'], challenge: 'PRDのみで運用していたが、開発・品質面での確認精度を上げるためFSD作成を試験導入', solution: 'Cursor AIでPRD/FSD作成の標準フローを構築、AIとの対話で要求を明確化し、不足情報はヒアリング', result: '必要な項目が網羅された状態でドキュメントが生成され、作成工数が大幅削減、属人化も解消', voice: 'フォーマット統一で読み手の確認コストも下がり、生産性が向上しました', steps: ['PRD/FSDのテンプレートを用意', 'Cursorで「このテンプレートに沿ってPRDを作成して」と指示', 'AIが不足情報を質問形式でヒアリング', '回答を元にドキュメントを生成', 'Notionにエクスポートして共有'] },
+    { id: 92, cat: 'learning', title: '100ページのマニュアルを音声解説＆Q&Aで共有', tools: ['NotebookLM'], challenge: '半期ごとの評価マニュアルは合計100ページにも及び、内容を読み込み理解するのに負担がかかっていた', solution: 'NotebookLMにマニュアル一式を読み込ませ、音声解説とQ&Aチャットが可能な状態でマネージャーに展開', result: '移動中に音声でインプットしたり、疑問点をチャットで即座に解消できるようになり、定着率と利便性が向上', voice: '音声解説でインプットでき、疑問を各々がチャットで質問可能になり便利とのお声を頂きました', steps: ['評価マニュアル一式をPDF等で準備', 'NotebookLMにすべてのファイルをアップロード', 'Audio Overview機能で音声解説を生成', 'NotebookLMの共有リンクをマネージャーに展開', '各自が音声で学習し、チャットで疑問を解消'] },
+    { id: 93, cat: 'design', title: 'BGM制作前にAIでラフ動画を作成しイメージ共有', tools: ['Gemini'], challenge: 'ゲームのサウンドイメージをBGM制作前にディレクターとすり合わせる際、具体的なイメージを伝えるのが難しかった', solution: 'Geminiでゲームイメージに近い画像を作成し、サウンドイメージ詳細を伝えてBGMありの動画を作成', result: 'BGM制作なしで具体的なすり合わせが可能になり、制作時間を短縮', voice: 'AIで作成した動画とサウンドを用いてスムーズにイメージを伝えることができました！', steps: ['サウンドイメージを言語化（テンポ、雰囲気、楽器等）', 'Geminiに「〇〇のイメージに合う画像を生成して」と依頼', '生成された画像を使ってラフ動画を作成', 'フリー素材やAI生成音源でBGMを仮当て', 'ディレクターとイメージをすり合わせ'] },
+    { id: 94, cat: 'document', title: '業務引継ぎ動画から業務マニュアルを作成', tools: ['Gemini'], challenge: '業務マニュアル作成に工数がかかりすぎていた', solution: '業務を引き継ぐ会議をZoomやMeetで録画し、動画をGeminiに渡してマニュアル化。まず構成案を作りレビューしてから詳細を生成', result: '細かなミスはあるものの、業務マニュアル作成の工数を大幅に削減', voice: '会議中の質疑応答も反映した内容でマニュアルの下書きを作成でき、とても便利です', steps: ['業務引継ぎ会議を録画', '動画ファイルをGeminiにアップロード', '「この動画から業務マニュアルの構成案を作成して」と指示', '構成案をレビューし、フィードバック', '「この構成で詳細なマニュアルを生成して」で完成'] },
+    { id: 95, cat: 'planning', title: '企画立案から提案まで全フローをAIと実行', tools: ['Gemini', 'NotebookLM', 'Copilot'], challenge: '通常業務と並行して新規企画を検討する際、調査・資料作成・モック作成に時間がかかり無理なく進めるのが困難だった', solution: '全フロー（企画立案、モック作成、調査レポート、スライド作成、インタビュー議事録など）でAIを活用、自分はAIとの対話と意思決定、最終調整のみ', result: '各工程の作業時間を大幅に短縮し、企画の質とスピードが向上', voice: 'ほぼAIとの対話と意思決定のみで、他はAIがやってくれたため大変効率的でした', steps: ['企画アイデアを整理', 'Geminiで市場調査・競合分析を実施', 'NotebookLMで関連資料を整理、インサイトを抽出', 'Copilotでモック・スライドを作成', '各工程でAIと対話し、最終調整のみ人間が実施'] },
+    { id: 96, cat: 'automation', title: '録画画面からGASコードを生成', tools: ['Gemini', 'GAS'], challenge: 'GAS作成時にやりたい処理や条件をテキストで詳細に言語化するのに時間がかかっていた', solution: '画面録画で「ここをこうしたい」と実際に操作しながら説明する短い動画を撮影し、Geminiに渡してスクリプトを作成', result: '前提情報をテキスト化する手間が省け、直感的な動画指示でベースのコードが作成でき、開発ハードルが劇的に低下', voice: '前提情報を伝える時間も手間も両方軽減できたのでおすすめです！', steps: ['スプレッドシート等の画面を録画しながら「ここをこうしたい」と音声で説明', '録画ファイルをGeminiにアップロード', '「この動画の操作を自動化するGASを作成して」と指示', 'AIが動画を解析し、GASコードを生成', 'コードを確認・実行して動作確認'] },
+    { id: 97, cat: 'learning', title: '1on1議事録を分析しメンター育成をAIが支援', tools: ['Vertex AI'], challenge: '新卒メンターの1on1スキルが属人化しており、効果的なフィードバックを得る機会が限られていた', solution: 'Meetの議事録をAIが解析し、社内ナレッジを参照してメンターへの改善フィードバックを自動生成', result: '1on1内容と社内ベストプラクティスを組み合わせた適切なフィードバックが可能になり、メンターの成長支援に繋がった', voice: '今後はさらに利用範囲を拡大し、全社の1on1品質向上に貢献していきたいです', steps: ['1on1のMeet議事録を収集', '社内の1on1ベストプラクティス資料を準備', 'Vertex AIで議事録を解析するパイプラインを構築', 'ベストプラクティスと照合してフィードバックを生成', 'メンターにフィードバックを共有'] },
+    { id: 98, cat: 'coding', title: '非エンジニアがChrome拡張作成でSlackを便利に', tools: ['GitHub Copilot'], challenge: 'Slackのチャンネル数が多くセクション管理だけでは視認性が低く誤爆リスクがあった', solution: 'AIでChrome拡張機能を実装、チャンネルによってテーマカラーを切り替えて分かりやすくする機能を作成', result: '外部チャンネルは赤くするなど視覚的に区別でき、使い勝手が向上', voice: '特別な環境なくてもAIで気軽にChrome拡張を作成できました', steps: ['実現したい機能を整理（例：特定チャンネルで背景色を変更）', 'GitHub Copilotに「Slackのチャンネルによって背景色を変えるChrome拡張を作成して」と依頼', '生成されたmanifest.json、content.jsを取得', 'chrome://extensionsでデベロッパーモードをONにし、読み込み', '動作を確認し、必要に応じて調整'] },
+    { id: 99, cat: 'automation', title: '「設計原則」と「制約条件」で手戻りを防ぐGASプロンプト', tools: ['Gemini', 'GAS'], challenge: 'AIにGASを依頼してもエラーや意図しない挙動になり、修正のやり取りに工数がかかることがあった', solution: '「絶対にエラーを出さない」堅牢性を最優先し、厳格な設計原則と制約条件を組み込んだプロンプトテンプレートを作成して社内共有', result: 'エラー発生頻度が大幅に下がり、極力修正のいらない高品質なスクリプトが一発で生成できるようになった', voice: '「これ自動化できるかもな」と考えてから実現するまでのスピードが早くなり、チームのAI化・自動化がグッと進んでいます！', steps: ['GAS生成時によく発生するエラーパターンを収集', '「エラーを出さない」ための設計原則を整理', 'プロンプトテンプレートに設計原則と制約条件を組み込む', 'テンプレートを使ってGASを生成', '社内でテンプレートを共有し、品質を標準化'] },
+    { id: 100, cat: 'planning', title: 'Gemini CanvasとGoogle Sitesでプロト開発', tools: ['Gemini', 'Canvas', 'Google Sites'], challenge: 'PRDや要件定義のドキュメントだけでは実現方法やUXのイメージが伝わりにくかった', solution: 'GeminiのCanvasでプロトタイピングし、htmlをGoogle Sitesに貼り付けてチーム内に動作するプロトタイプを公開', result: 'イメージやUXの共有が爆速になり、詳細な設計や工数見積もりの速度が上がり、手戻りも減った', voice: '実装前に社内のイメージのすり合わせを十全にやることで手戻りを減らせました', steps: ['企画のUI/UXイメージを整理', 'Gemini Canvasで「〇〇の画面をHTML/CSS/JSでプロトタイプを作成して」と依頼', '生成されたHTMLコードを取得', 'Google Sitesで「埋め込み」→「コード埋め込み」でHTMLを貼り付け', 'サイトを公開し、チームでプロトタイプを確認'] }
+];
+
+// フィルタ生成
+const filtersEl = document.getElementById('filters');
+[{ id: 'all', name: 'ALL' }, ...cats].forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn en' + (cat.id === 'all' ? ' active' : '');
+    btn.dataset.category = cat.id;
+    btn.textContent = cat.name;
+    filtersEl.appendChild(btn);
+});
+
+// サイドバー生成
+const catNavEl = document.getElementById('catNav');
+cats.forEach((cat, i) => {
+    const count = tips.filter(t => t.cat === cat.id).length;
+    const li = document.createElement('li');
+    li.className = 'cat-nav-item';
+    li.dataset.category = cat.id;
+    li.innerHTML = '<span class="cat-nav-num en">' + String(i + 1).padStart(2, '0') + '</span><span class="cat-nav-name">' + cat.name + '</span><span class="cat-nav-count en">' + count + '</span>';
+    catNavEl.appendChild(li);
+});
+
+// コンテンツ生成
+const contentEl = document.getElementById('content');
+cats.forEach((cat, i) => {
+    const catTips = tips.filter(t => t.cat === cat.id);
+    const section = document.createElement('section');
+    section.className = 'category-section';
+    section.dataset.category = cat.id;
+    let tipsHtml = '';
+    catTips.forEach(tip => {
+        let toolsHtml = '';
+        tip.tools.forEach(t => { toolsHtml += '<span class="tool-tag en">' + t + '</span>'; });
+        tipsHtml += '<div class="tip-card" data-id="' + tip.id + '"><div class="tip-top"><span class="tip-num en">' + String(tip.id).padStart(3, '0') + '</span><span class="tip-arrow">→</span></div><div class="tip-title">' + tip.title + '</div><div class="tip-tools">' + toolsHtml + '</div></div>';
+    });
+    section.innerHTML = '<div class="category-header"><div><div class="category-num en">' + String(i + 1).padStart(2, '0') + '. ' + cat.nameEn.toUpperCase() + '</div><h2 class="category-title">' + cat.name + '</h2></div><div class="category-count en">' + catTips.length + ' Cases</div></div><div class="tips-grid">' + tipsHtml + '</div>';
+    contentEl.appendChild(section);
+});
+
+// フィルタ
+document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const cat = btn.dataset.category;
+        document.querySelectorAll('.category-section').forEach(s => {
+            s.style.display = (cat === 'all' || s.dataset.category === cat) ? 'block' : 'none';
+        });
+    });
+});
+
+// サイドバークリック
+document.querySelectorAll('.cat-nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+        const cat = item.dataset.category;
+        const target = document.querySelector('.category-section[data-category="' + cat + '"]');
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+    });
+});
+
+// 検索
+document.getElementById('searchInput').addEventListener('input', (e) => {
+    const term = e.target.value.toLowerCase();
+    document.querySelectorAll('.tip-card').forEach(card => {
+        const title = card.querySelector('.tip-title').textContent.toLowerCase();
+        const tools = card.querySelector('.tip-tools').textContent.toLowerCase();
+        card.style.display = (title.includes(term) || tools.includes(term)) ? 'flex' : 'none';
+    });
+    document.querySelectorAll('.category-section').forEach(section => {
+        const hasVisible = section.querySelector('.tip-card[style="display: flex;"], .tip-card:not([style])');
+        section.style.display = hasVisible ? 'block' : 'none';
+    });
+});
+
+// モーダル
+const overlay = document.getElementById('overlay');
+const modal = document.getElementById('modal');
+const close = () => { overlay.classList.remove('active'); modal.classList.remove('active'); };
+overlay.addEventListener('click', close);
+document.getElementById('closeBtn').addEventListener('click', close);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+
+document.querySelectorAll('.tip-card').forEach(card => {
+    card.addEventListener('click', () => {
+        const id = parseInt(card.dataset.id);
+        const tip = tips.find(t => t.id === id);
+        if (!tip) return;
+        const cat = cats.find(c => c.id === tip.cat);
+        document.getElementById('modalMeta').textContent = 'No. ' + String(tip.id).padStart(3, '0') + ' — ' + cat.nameEn;
+        document.getElementById('modalTitle').textContent = tip.title;
+        let toolsHtml = '';
+        tip.tools.forEach(t => { toolsHtml += '<span class="tool-tag en">' + t + '</span>'; });
+        document.getElementById('modalTools').innerHTML = toolsHtml;
+        let stepsHtml = '';
+        tip.steps.forEach(step => { stepsHtml += '<li>' + step + '</li>'; });
+        document.getElementById('modalBody').innerHTML = '<div class="modal-section"><div class="modal-label en">Challenge</div><div class="modal-text">' + tip.challenge + '</div></div><div class="modal-section"><div class="modal-label en">Solution</div><div class="modal-text">' + tip.solution + '</div></div><div class="modal-section"><div class="modal-label en">Result</div><div class="modal-text">' + tip.result + '</div></div><div class="modal-steps"><div class="modal-steps-title en">How to Implement</div><ol class="modal-steps-list">' + stepsHtml + '</ol></div><div class="modal-quote"><div class="modal-quote-text">' + tip.voice + '</div><div class="modal-quote-label en">User Voice</div></div>';
+        overlay.classList.add('active');
+        modal.classList.add('active');
+    });
+});
+</script>
+</body>
+</html>
+
+<script>
+const cats = [
+    { id: 'document', name: '文書作成', nameEn: 'Document' },
+    { id: 'coding', name: 'コーディング', nameEn: 'Coding' },
+    { id: 'data', name: 'データ分析', nameEn: 'Data Analysis' },
+    { id: 'automation', name: '業務自動化', nameEn: 'Automation' },
+    { id: 'research', name: 'リサーチ', nameEn: 'Research' },
+    { id: 'learning', name: '学習', nameEn: 'Learning' },
+    { id: 'meeting', name: '会議', nameEn: 'Meeting' },
+    { id: 'design', name: 'デザイン', nameEn: 'Design' },
+    { id: 'planning', name: '企画', nameEn: 'Planning' },
+    { id: 'security', name: 'セキュリティ', nameEn: 'Security' }
+];
+
+const tips = [
+    { id: 1, cat: 'document', title: 'NotebookLMでWebサイト参照が爆速化', tools: ['NotebookLM'], challenge: '法律やガイドラインの内容を体系的に整理するのに時間がかかっていた', solution: 'WebサイトのURLをNotebookLMにソースとして追加し、関連キーワードで質問して該当箇所を抜粋・要約', result: '情報のインプットを効率化し、より本質的な思考や創造的な作業に注力できるようになった', voice: 'もう手放せません！法律等の参照がこんなに簡単になるなんて', steps: ['NotebookLMを開き、新しいノートブックを作成', '「ソースを追加」から参照したいWebサイトのURLを入力', '追加されたソースに対して「〇〇について要約して」等の質問を入力', 'AIが該当箇所を抜粋・要約して回答を生成', '必要に応じて追加質問で深掘りし、情報を整理'] },
+    { id: 2, cat: 'data', title: 'GoogleドライブでPDF情報を即座に取得', tools: ['Gemini'], challenge: '大量のPDF資料から特定の情報を探し出すのに時間と手間がかかっていた', solution: 'Googleドライブ上のPDFでGeminiを開き、内容に関する具体的な質問を入力', result: '情報収集にかかる時間を大幅に短縮。英文PDFも和訳して回答してくれる', voice: 'ページ数が多いPDF資料の中から、必要な情報を瞬時に見つけられるようになりました', steps: ['GoogleドライブにPDFファイルをアップロード', 'PDFファイルを開き、右上の「Geminiで開く」をクリック', '「このPDFの〇〇について教えて」など具体的な質問を入力', 'Geminiが該当箇所を特定し回答を生成', '英文PDFの場合は「日本語で要約して」と追加指示'] },
+    { id: 3, cat: 'coding', title: 'GitHub Copilotでコードレビュー自動化', tools: ['GitHub Copilot'], challenge: '手動でのコードレビューは時間と労力がかかり、開発のボトルネックになっていた', solution: 'GitHub Copilot code reviewを使った自動PRレビューを実施', result: 'PoC段階だが、精度は業務利用に十分なレベル', voice: 'コードの品質向上とレビュー担当者の負担軽減につながると感じています', steps: ['GitHubリポジトリでGitHub Copilotを有効化', 'プルリクエストを作成', 'Copilot code reviewをリクエスト（PRページから実行）', 'AIがコードの問題点、改善提案を自動でコメント', '提案内容を確認し、必要に応じて修正を適用'] },
+    { id: 4, cat: 'coding', title: 'プログラミング知識ゼロからChrome拡張を開発', tools: ['生成AI'], challenge: 'セキュリティ要件を満たすOGP画像表示ツールが必要だったが、既存ツールでは対応できなかった', solution: '生成AIに機能要件とセキュリティ要望を伝え、Chrome拡張機能を開発依頼', result: 'エンジニアレビュー後、必要な画像テストを安全に実施できるようになった', voice: 'セキュリティに配慮しつつ、必要な機能を備えたツールを自作できました！', steps: ['実現したい機能を箇条書きで整理（例：OGP画像を表示、特定ドメインのみ動作）', '生成AIに「Chrome拡張機能を作成して」と依頼し、要件を伝える', 'AIが生成したmanifest.json、background.js等のコードを取得', 'chrome://extensionsで「デベロッパーモード」をONにし、フォルダを読み込み', 'エンジニアにセキュリティレビューを依頼してから本番利用'] },
+    { id: 5, cat: 'learning', title: '勉強会動画から専門用語集を自動作成', tools: ['Gemini'], challenge: '社内勉強会の動画には専門用語が多く、視聴者が内容を理解するのが難しかった', solution: 'Geminiに動画を添付し「この動画内の〇〇分野の用語集を作って」と指示', result: '動画内容に沿った専門用語集を素早く簡単に作成できるようになった', voice: '利用者目線のアウトプットをスピーディーに作成できました', steps: ['勉強会の録画動画ファイルを用意', 'Gemini（動画対応版）を開き、動画ファイルをアップロード', '「この動画に出てくる〇〇分野の専門用語を抽出し、用語集を作成して」と指示', 'AIが用語と説明のリストを生成', '内容を確認・編集し、参加者に共有'] },
+    { id: 6, cat: 'meeting', title: 'Meet・Gemini・NotebookLMで議事録工数をほぼゼロに', tools: ['Gemini', 'NotebookLM'], challenge: '会議の議事録作成や欠席者への情報共有が負担になっていた', solution: 'MeetとGeminiで文字起こしを自動化し、NotebookLMに集約・ストック', result: '議事録作成の工数をほぼゼロに。次回議題作成や報告業務も効率化', voice: '会議後の議事録作成や情報共有のストレスが完全に解消されました！', steps: ['Google Meetの設定で「文字起こし」を有効化して会議を実施', '会議終了後、自動生成された文字起こしデータを取得', 'Geminiに文字起こしを渡し「議事録形式でまとめて」と指示', '生成された議事録をNotebookLMにソースとして追加', '過去の議事録をNotebookLMで横断検索・質問可能に'] },
+    { id: 7, cat: 'data', title: 'マインドマップで企画検証項目を視覚化', tools: ['NotebookLM'], challenge: '企画の振り返りで検証項目が膨大にあり、最適な項目選択に時間がかかっていた', solution: 'NotebookLMのマインドマップ機能で検証項目を図式化', result: '見過ごしていた検証指数に気づけるようになり、具体的な改善案を複数出せるようになった', voice: 'データ分析への苦手意識がなくなりました！', steps: ['企画資料や分析データをNotebookLMにアップロード', '「この企画の検証項目をマインドマップで整理して」と指示', 'NotebookLMがマインドマップ形式で検証項目を可視化', '抜け漏れている観点がないか確認', '各項目について「詳しく教えて」で深掘り'] },
+    { id: 8, cat: 'data', title: '画像入力でSQL自動生成', tools: ['Cursor'], challenge: '分析の要件定義書をSQL文に変換する作業に経験と時間が必要だった', solution: 'Cursorにスプレッドシートの要件定義書を画像として入力し、SQLを自動生成', result: '分析メンバーはレビューのみで済むようになる見込み', voice: 'スプレッドシートからSQLが生成されれば、本質的な分析に注力できます', steps: ['スプレッドシートの要件定義書をスクリーンショットで取得', 'Cursorを開き、画像を添付', '「この要件定義書に基づいてSQLクエリを生成して」と指示', 'AIがテーブル構造を推測しSQLを生成', '生成されたSQLをレビューし、必要に応じて修正'] },
+    { id: 9, cat: 'document', title: 'DeepResearchで口コミ分析レポート作成', tools: ['Gemini', 'DeepResearch'], challenge: '週次ソーシャル報告レポートの作成に最大4時間かかっていた', solution: 'GeminiのDeepResearch機能でネット上の口コミを網羅的に調査し、トピックごとに要約', result: 'レポート作成時間が30分程度に短縮', voice: '要約された情報をコピペするだけで、高品質なレポートが完成します', steps: ['Geminiを開き、DeepResearchモードを選択', '「〇〇（製品名）の直近1週間の口コミを調査して」と指示', 'AIがWeb上の口コミを網羅的に収集・分析', 'トピックごとに要約されたレポートを確認', '必要な部分を抜粋してレポートに転記'] },
+    { id: 10, cat: 'document', title: '法令解釈をポッドキャスト化して共有', tools: ['NotebookLM'], challenge: '複雑な医療関連の法令を理解するのに時間がかかっていた', solution: 'NotebookLMに法令解釈を読み込ませ、FAQを作成してポッドキャスト化', result: '耳からも情報を得られるようになり、他チームにも共有されて業務効率化に貢献', voice: '音声で聞くことで「スッと内容が入ってくる」と好評です', steps: ['法令文書やガイドラインをNotebookLMにアップロード', '「この法令のFAQを作成して」と指示', '生成されたFAQを確認・編集', 'NotebookLMの「Audio Overview」機能で音声化', '生成されたポッドキャストのリンクをチームに共有'] },
+    { id: 11, cat: 'automation', title: '大量のファイル名変更をGASで一瞬で完了', tools: ['Gemini', 'GAS'], challenge: '毎日手作業でファイルをルールに沿ってリネームしていた', solution: 'Geminiに相談してスプレッドシートでファイル名を一括変更できるGASを作成', result: '作業時間を大幅に短縮し、手作業によるミスもなくなった', voice: '面倒だと感じていた単純作業から解放されストレスが大きく減りました', steps: ['リネームルールを整理（例：日付_プロジェクト名_連番）', 'Geminiに「Googleドライブのファイルを一括リネームするGASを作って」と依頼', '生成されたコードをGoogleスプレッドシートのApps Scriptに貼り付け', 'スプレッドシートにフォルダIDとリネームルールを入力', 'スクリプトを実行してファイル名を一括変更'] },
+    { id: 12, cat: 'automation', title: 'Slack通知からJIRAチケットを自動起票', tools: ['Gemini', 'GAS'], challenge: 'Slack通知後に手動でJIRAチケットを作成する必要があり手間だった', solution: 'Geminiに依頼して、Slack通知からJIRAチケットを自動作成するGASを生成', result: 'チケットの起票漏れがなくなり、工数を大幅削減', voice: 'プログラミングの手間なく自動化・効率化を実現できました', steps: ['Slack APIとJIRA APIのトークンを取得', 'Geminiに「Slackの特定チャンネルの投稿をJIRAチケットに自動起票するGASを作って」と依頼', '生成されたコードをApps Scriptにコピー', 'APIトークンと対象チャンネルIDを設定', 'トリガーを設定して定期実行を有効化'] },
+    { id: 13, cat: 'coding', title: 'AIに博多弁の人格を設定してコーディング効率UP', tools: ['Cursor', 'Claude Code'], challenge: 'AIの機械的な返答にストレスを感じていた', solution: '「博多弁で話す美術や落語に詳しいAI」として口調を設定', result: 'AIに話しかけるハードルが下がり、カジュアルに相談できるようになった', voice: '変な出力にも「この子かわいいな」という思考になり、精神衛生が向上しました', steps: ['CursorまたはClaude Codeの設定画面を開く', 'システムプロンプト（.cursorrules等）を編集', '「あなたは博多弁で話す、美術や落語に詳しいAIアシスタントです」等の人格設定を記述', '口調の例文も追加して精度を上げる', '設定を保存し、通常通りコーディングに活用'] },
+    { id: 14, cat: 'learning', title: 'PM研修教材をChatGPTで短期間作成', tools: ['ChatGPT'], challenge: '2時間×2日間のPM研修教材を短期間で作成する必要があった', solution: 'ChatGPTで構成の壁打ち、トークスクリプトの参考案を作成', result: '教材作成時間の短縮とストレスの緩和に繋がった', voice: '難しい内容も「優しく答えて」などプロンプトで利用者に沿った形で理解できました', steps: ['研修の目的・対象者・時間配分を整理', 'ChatGPTに「PM研修のカリキュラム案を作成して」と依頼', '提案された構成をベースに内容を壁打ち', '各セクションのトークスクリプト案を生成', '出力を参考に最終的な教材を作成'] },
+    { id: 15, cat: 'automation', title: '全社の異動情報をGASで自動可視化', tools: ['Gemini', 'GAS'], challenge: '異動情報のCSVデータが分かりにくく、マネージャーへの共有が困難だった', solution: 'Geminiと対話しながら、異動情報を自動で整理・展開するGASを作成', result: '情報共有がスムーズかつセキュアになり、管理コストを大幅削減', voice: 'プログラミングの知識がなくても、AIとの対話でここまで出来ることに驚きました', steps: ['異動情報CSVのフォーマットを確認', 'Geminiに「CSVを読み込んで部署別・期間別に整理するGASを作って」と依頼', '生成されたコードをApps Scriptに貼り付け', 'スプレッドシートにCSVをインポートし実行', '整理されたデータを権限設定して共有'] },
+    { id: 16, cat: 'automation', title: '画像を送るだけでカレンダーに自動登録', tools: ['Gemini'], challenge: '複数の予定をGoogleカレンダーに手で一つずつ入力するのが手間だった', solution: 'Geminiアプリにスケジュールの写真を送って「カレンダーに入れて」と依頼', result: '手動入力の手間が大幅に削減され、時短に繋がった', voice: 'スマホで撮って送るだけで登録作業が終わるのは本当に楽です', steps: ['予定表やチラシをスマホで撮影', 'Geminiアプリを開き、画像を添付', '「この予定をGoogleカレンダーに登録して」と指示', 'Geminiが日時・タイトル・場所を抽出', '確認画面で内容をチェックし、カレンダーに追加'] },
+    { id: 17, cat: 'coding', title: 'データ連携作業を自動化し数人日分の工数を削減', tools: ['Cursor', 'Claude'], challenge: 'WebUIから手作業でのデータ連携作業に時間がかかっていた', solution: 'AIにコードベース調査、実現案検討、スクリプト実装まで依頼', result: '本来数時間かかる作業がわずか30分で完了', voice: '工数を、おそらく数人日単位で削減できました', steps: ['自動化したい作業フローを整理', 'Cursorでプロジェクトを開き、既存コードベースを読み込み', '「このデータ連携作業を自動化するスクリプトを作成して」と指示', 'AIが既存コードを参照しながら実装案を提案', 'コードをレビュー・テストして本番適用'] },
+    { id: 18, cat: 'planning', title: 'AIとの対話でモックアップ作成が3日も早くなった', tools: ['Gemini'], challenge: '企画のモックアップを一から考えるのに多くの時間がかかっていた', solution: 'Geminiに企画要件を伝え、対話しながらモックアップの構成案を作成', result: '初期の画面構成案作成が大幅に短縮され、メンバーとの意思疎通も効率化', voice: 'AIが壁打ち相手になってくれることで、企画の解像度も上がりました', steps: ['企画の目的・ターゲット・主要機能を整理', 'Geminiに「〇〇アプリの画面構成案を考えて」と依頼', '提案された構成に対して「〇〇機能を追加して」等のフィードバック', '対話を繰り返しながら構成を詰める', '最終案をFigma等でモックアップ化'] },
+    { id: 19, cat: 'research', title: 'コピーライティングの考え方とワーディングを分析', tools: ['Gemini'], challenge: 'AIのコピー生成は品質担保に経験が必要だった', solution: 'Geminiにコピーライターの設定を与え、コピーの構造・ワーディングを分析させてフレームワーク化', result: 'AIによるコピーの精度や効率が向上', voice: 'クリエイティブ職以外の方でも良い品質の成果物を得られるようにしていきたいです', steps: ['優れたコピーのサンプルを複数収集', 'Geminiに「あなたはベテランのコピーライターです」と設定', '「このコピーの構造とワーディングの特徴を分析して」と指示', '分析結果をフレームワーク化して整理', 'フレームワークを使って新しいコピーを生成'] },
+    { id: 20, cat: 'security', title: 'ネットワーク障害アラートの初動対応を自動化', tools: ['Gemini', 'LangChain'], challenge: '24時間365日のアラート対応で影響範囲特定・原因調査に時間がかかっていた', solution: 'GeminiとLangChainでアラート情報を自動取得・分析するエージェント「NOA」を開発', result: '障害対応の初動を大幅に効率化。エンジニアは高度な判断に集中できるようになった', voice: '人間は最終確認と対応に集中できるようになり、スピードと質が向上しました', steps: ['アラート情報の取得元API（監視ツール等）を特定', 'LangChainでGeminiと各種APIを連携するエージェントを設計', 'アラート受信時に影響範囲・関連ログを自動取得するフローを実装', '分析結果をSlackに自動投稿する処理を追加', '継続的に精度を改善しながら運用'] },
+    { id: 21, cat: 'automation', title: 'ObsidianとCursorでタスク管理を自動更新', tools: ['Cursor', 'Obsidian'], challenge: 'タスク・プロジェクト管理の煩雑さと更新漏れがあった', solution: 'Cursor連携でObsidianに「やったこと」を箇条書きするだけで進捗管理を自動化', result: '更新漏れゼロ！プロジェクトの全体像が常に明確に', voice: '効率的な進行が可能になりました', steps: ['Obsidianでタスク管理用のテンプレートを作成', 'Cursorでプロジェクトフォルダを開く', '「今日やったこと」を箇条書きで記録', 'CursorのAIに「進捗を集計して更新して」と指示', 'AIがタスクの完了状況を自動で反映'] },
+    { id: 22, cat: 'planning', title: 'イベント企画から実行までAIがサポート', tools: ['Gemini'], challenge: 'KPI設定、施策検討、取材対応、進行管理に時間と労力がかかっていた', solution: 'KPIの考え方や施策の壁打ち、スケジュール設計をAIに相談', result: '企画・実行の効率化と運営品質の向上、負荷軽減に繋がった', voice: '他業務の合間に検討でき、まとまった時間が不要で便利です', steps: ['イベントの目的・規模・予算を整理', 'Geminiに「〇〇イベントのKPI案を提案して」と依頼', '提案されたKPIをベースに施策を壁打ち', '「スケジュールを作成して」で進行表を生成', '各フェーズでAIに相談しながら進行'] },
+    { id: 23, cat: 'data', title: 'Cloudwatch Logsの非構造化データから業務問題を洗い出し', tools: ['Cursor', 'Claude'], challenge: '大量の非構造化ログから業務上の問題を手動で探すのは困難だった', solution: '業務上問題があるデータを洗い出すPythonスクリプトの作成を依頼', result: '問題の早期発見と迅速な対応が可能に', voice: '担当者も「いつも大変お世話になっております！」と大絶賛', steps: ['Cloudwatch Logsからログデータをエクスポート', 'Cursorでプロジェクトを作成し、ログファイルを配置', '「このログから異常パターンを検出するPythonスクリプトを作成して」と指示', 'AIが生成したスクリプトをテスト実行', '検出ルールを調整しながら精度を向上'] },
+    { id: 24, cat: 'coding', title: 'リポジトリ丸ごと爆速・高精度なレビューを実現', tools: ['Gemini 2.5 Pro'], challenge: '従来のAIレビューではコンテキストが正確に伝わらず、網羅性や精度に限界があった', solution: 'Gemini 2.5 Proでリポジトリ全体を対象に脆弱性・パフォーマンス・設計レビューを実施', result: '複数ファイルにまたがるロジックの脆弱性も検出可能に。レビューは約5分で完了', voice: 'もはや人間だけのレビューには戻れないレベルに達していると感じます', steps: ['リポジトリをzip化またはGitHub連携で準備', 'Gemini 2.5 Pro（大容量コンテキスト対応）を開く', 'リポジトリ全体をアップロード', '「セキュリティ脆弱性、パフォーマンス問題、設計上の改善点をレビューして」と指示', 'レビュー結果を確認し、優先度をつけて対応'] },
+    { id: 25, cat: 'data', title: 'DifyでSQL生成からデータ分析まで自然言語で実行', tools: ['Dify', 'Claude'], challenge: 'データ利活用にSQL習熟が必要で、限られた人員しかデータを扱えなかった', solution: 'データ基盤とDifyを連携し、自然言語で分析まで実行可能に', result: 'SQLを触ったことないメンバーが自らデータ分析して施策検討できるようになった', voice: 'LLM相手なら納得いくまでやり取りができて、満足度が高いです', steps: ['Difyでワークフローを新規作成', 'データベース接続の設定を追加', 'LLM（Claude）ノードを追加し、SQL生成プロンプトを設定', '「〇〇の売上を月別で集計して」等の自然言語入力でテスト', '権限設定をして社内メンバーに公開'] },
+    { id: 26, cat: 'coding', title: 'DevinでバイブコーディングしてPR作成', tools: ['Devin'], challenge: 'QA担当がツール修正をエンジニアに依頼するしかなく、もどかしさがあった', solution: 'AIソフトウェアエンジニア「Devin」に自然言語で指示してツール修正', result: '職種の壁を越えて、自身でPRを出してプロダクト改善サイクルを回せるようになった', voice: 'アイデアをすぐに形にできるようになりました', steps: ['Devinにリポジトリへのアクセス権限を付与', 'Slackまたは専用UIからDevinに修正内容を自然言語で指示', 'Devinがコードを修正し、PRを自動作成', 'PRの内容をレビュー', '問題なければマージして完了'] },
+    { id: 27, cat: 'research', title: 'Deep Researchで諸外国の概況を事前調査', tools: ['DeepResearch'], challenge: '仕向地の言語や事情に精通していない状況で、法令や要請の調査に時間を要していた', solution: 'Deep Researchに法令内容と事業者の対応状況を一覧化させる', result: 'インターネット上の実例を元に、広く浅く概況を把握する資料が得られる', voice: 'ハルシネーションが存在する前提で運用可能。調査の足掛かりとして有用', steps: ['調査対象国・分野・観点を整理', 'Deep Research機能を開く', '「〇〇国の△△規制について、法令内容と企業の対応状況を調査して」と指示', 'AIが複数ソースから情報を収集・整理', '出典を確認しながら、深掘りが必要な点を特定'] },
+    { id: 28, cat: 'coding', title: '非エンジニアがコマンド一つでモック確認', tools: ['Cursor', 'Claude'], challenge: '非エンジニアがモックをローカルで確認する際、環境構築で沼っていた', solution: 'Cursor Agentに「立ち上げて」と言うだけで必要なコマンドを自動実行', result: '非エンジニアでも簡単にモックをチェックできるようになった', voice: 'ユーザーフレンドリーな操作性で扱いやすいです', steps: ['Cursorでプロジェクトフォルダを開く', 'Agent機能を有効化', '「このプロジェクトを立ち上げて」と指示', 'Agentが必要なコマンド（npm install、npm run dev等）を自動実行', 'ブラウザでモックを確認'] },
+    { id: 29, cat: 'security', title: '新機能のテストケース作成をAIで効率化', tools: ['Gemini Flash'], challenge: 'リリース速度と品質を保ちながら品質チェック工程を効率化したかった', solution: 'PRDをインプットにGemini Flashでテスト観点を作成し、レビューも依頼', result: 'テスト観点抽出からレビューまでの一連のプロセスを効率化、品質も向上', voice: 'AIはタイミングや回数に気兼ねなくいつでもレビューの相方になってくれて心強い', steps: ['PRD（製品要求仕様書）を準備', 'Gemini Flashに「このPRDからテスト観点を洗い出して」と依頼', '生成されたテスト観点をレビュー', '「抜け漏れがないかチェックして」で追加観点を確認', 'テストケースとして整理し、QAチームに展開'] },
+    { id: 30, cat: 'coding', title: 'Pythonコードの品質改善', tools: ['Cursor', 'Claude'], challenge: 'Type HintやLinterが未適用のPoCコードをプロダクション移行する際、エラー検知が複雑だった', solution: 'Cursorにコードベースを読み込ませ「Ruffやmypyのエラーがゼロになるまで修正せよ」と指示', result: 'AIが自動的に修正案を生成・適用し、品質が大きく改善', voice: '実際にコマンドを実行しながら進めてくれるので、進捗が分かりやすく良かったです', steps: ['Cursorでプロジェクトを開く', 'ruffとmypyをインストール', 'Agentに「ruff check .とmypy .のエラーがゼロになるまでコードを修正して」と指示', 'AIがエラーを検出し、順次修正を適用', '最終的にエラーゼロを確認してコミット'] },
+    { id: 31, cat: 'document', title: 'Confluenceから情報を自動集約し報告資料を生成', tools: ['Gemini'], challenge: 'Confluence上の複数ページから情報を収集して資料にまとめる作業が非常に手間だった', solution: 'Confluenceから情報を取得しマークダウン形式に変換、Geminiで報告資料にまとめる', result: '情報収集と資料作成の手間が大幅に削減され、月次報告の準備が迅速に', voice: '散らばっていた情報をAIが一瞬で集約してくれるので、報告業務の負担が劇的に軽くなりました', steps: ['Confluenceの対象ページをエクスポートまたはコピー', 'マークダウン形式に変換（手動またはツール使用）', 'Geminiに「この情報を報告資料形式でまとめて」と依頼', '生成された報告資料の構成・内容を確認', '必要に応じて編集し、最終資料として完成'] },
+    { id: 32, cat: 'security', title: 'アンケート動作テスト用のペルソナパターンをAI生成', tools: ['Gemini'], challenge: 'アンケートの動作テスト用に複数の回答者パターンを作成するのが手間だった', solution: 'Geminiに分岐点を指示し、チェック担当者×デバイス×ペルソナの組み合わせを生成', result: 'AIが網羅的に洗い出してくれ、チェック品質が向上し作業時間も短縮', voice: '動作確認作業の信頼性向上にもつながりました', steps: ['アンケートの分岐条件を整理', 'Geminiに「以下の分岐条件に基づいてテストパターンを網羅的に生成して」と依頼', '担当者・デバイス・ペルソナの組み合わせを出力', '生成されたパターンを確認し、不足があれば追加', 'テスト担当者に割り振って動作確認を実施'] },
+    { id: 33, cat: 'planning', title: '開発案件の工数見積もりを1週間→2日に短縮', tools: ['Gemini', 'Cline'], challenge: '工数見積もりに技術調査やタスク洗い出しで時間がかかり、精度にばらつきがあった', solution: 'Clineでコードベースを解析し実装方針を作成、Geminiでタスク分解して見積もり', result: '1週間かかっていた見積もりが2日で完了、精度も大幅向上', voice: 'AIが実装方針からタスク分解まで行ってくれるため、属人化を防げます', steps: ['Clineで既存コードベースを読み込み', '「この機能を追加する場合の実装方針を提案して」と指示', '提案された実装方針をGeminiに渡す', '「この実装方針をタスク分解し、各タスクの工数を見積もって」と依頼', '見積もり結果をレビューし、調整して確定'] },
+    { id: 34, cat: 'meeting', title: 'Slackスタンプのリアクション集計を秒速で完了', tools: ['NotebookLM'], challenge: 'Slackスタンプを押したメンバーを目視で集計するのが手間だった', solution: 'スタンプを押したメンバー表示のスクショをNotebookLMに渡してリスト化', result: '目視でリスト化していた作業が一瞬で完了', voice: '画像をAIに渡すだけで情報を整理してくれる手軽さに驚きました', steps: ['Slackでリアクションを表示し、スクリーンショットを撮影', 'NotebookLMを開き、画像をアップロード', '「この画像からリアクションしたメンバーをリスト化して」と指示', 'AIがメンバー名を抽出してリストを生成', 'リストをコピーして集計に活用'] },
+    { id: 35, cat: 'meeting', title: 'Atlassian RovoでAIがアジェンダを事前準備', tools: ['Atlassian Rovo', 'Jira'], challenge: '週次定例前にJiraチケットを確認してアジェンダをまとめる作業に時間がかかっていた', solution: 'Atlassian RovoとJira Automationを連携し、毎週自動でアジェンダを作成', result: '会議の準備時間が不要になり、進行がスムーズで議論が活発に', voice: 'もうAIのいない会議には戻れません', steps: ['Atlassian Rovoを有効化', 'Jira Automationで「毎週金曜にアジェンダ作成」ルールを設定', 'Rovoに「今週更新されたチケットからアジェンダを作成」と指示するトリガーを追加', '自動生成されたアジェンダをConfluenceに保存', '定例会議で自動作成されたアジェンダを活用'] },
+    { id: 36, cat: 'design', title: 'Fireflyでプレゼン資料の挿絵をAI生成', tools: ['Adobe Firefly', 'Photoshop'], challenge: '内容に合う挿絵を見つけるのに時間がかかり、商用利用可能な素材も限られていた', solution: 'Adobe Fireflyでプレゼン内容に合わせた画像を生成し、Photoshopで微調整', result: 'コンテンツに合った画像を短時間で作成でき、資料全体のクオリティが向上', voice: '画像探しに費やしていた時間を、内容のブラッシュアップに使えるようになりました', steps: ['プレゼン資料のテーマ・トーンを確認', 'Adobe Fireflyを開き、イメージを言語化したプロンプトを入力', '複数の候補から最適な画像を選択', 'Photoshopで色調・サイズを微調整', '資料に挿入して完成'] },
+    { id: 37, cat: 'meeting', title: '社内ミーティング議事録を再要約→Slack共有まで自動化', tools: ['Gemini', 'Vertex AI'], challenge: 'Meetの自動議事録は精度が不十分で、手直しや再要約が必要だった', solution: 'Meetの議事録をVertexAIに渡しGeminiで再要約、Slackに自動投稿するGASを開発', result: '議事録から要約、共有までが完全に自動化され、毎朝の作業が削減', voice: '朝会で決まった決定事項へのアクションにすぐ移れるようになりました', steps: ['Google Meetの文字起こしをGoogleドライブに保存する設定を確認', 'Vertex AI APIを有効化し、認証設定', 'GASで「ドライブの議事録→Geminiで要約→Slack投稿」のフローを作成', 'トリガーを設定して会議後に自動実行', '要約結果がSlackに自動投稿されることを確認'] },
+    { id: 38, cat: 'coding', title: '既存スクリプトをリファクタリングしステップ数3割削減', tools: ['Gemini'], challenge: '既存の請求書自動発行スクリプトは処理手順が多く、一部で手作業が発生していた', solution: '既存スクリプトをGeminiに読み込ませてレビューと改善提案を実施', result: '処理手順を3割削減し、手作業も自動化されて業務効率が向上', voice: '改善点を的確に指摘し、洗練されたコードに書き換えてくれることに驚きました', steps: ['既存スクリプトのコードをコピー', 'Geminiに「このスクリプトをレビューし、改善提案をして」と依頼', '提案された改善点を確認', '「提案を反映したコードを生成して」と指示', '新しいコードをテストして本番適用'] },
+    { id: 39, cat: 'research', title: '海外文献の調査をAIでスピードアップ', tools: ['ChatGPT', 'DeepResearch'], challenge: '海外の法令や指針の調査で、特に英語以外の文献は翻訳に多大な時間がかかった', solution: 'ChatGPTのDeepResearch機能で海外文献調査、自動で日本語要約と原典を取得', result: '翻訳にかかっていた時間が不要になり、海外法令調査が大幅に効率化', voice: 'AIが言語の壁を取り払ってくれたおかげで、業務の質が向上しました', steps: ['調査したい国・分野・キーワードを整理', 'ChatGPTのDeepResearch機能を開く', '「〇〇国の△△に関する法令・指針を調査し、日本語で要約して」と指示', 'AIが複数言語のソースから情報を収集・翻訳', '要約と原典リンクを確認し、必要に応じて深掘り'] },
+    { id: 40, cat: 'design', title: 'Gemini+Copilotでスライド作成を爆速化', tools: ['Gemini', 'GitHub Copilot'], challenge: 'スライド作成が苦手で、時間をかけても満足のいくクオリティが作れなかった', solution: 'Geminiで資料のアウトラインを決定し、GitHub Copilotでスライド内容を生成', result: 'スライド作成が爆速で完了し、クオリティも安定して向上', voice: 'まさに「得意を伸ばし、不得意を補う」AI活用です', steps: ['プレゼンの目的・対象者を整理', 'Geminiに「〇〇についてのプレゼン構成案を作成して」と依頼', '構成案をベースに各スライドの内容を壁打ち', 'Copilotで各スライドの文章・箇条書きを生成', 'スライドツールに転記し、デザインを調整'] },
+    { id: 41, cat: 'data', title: 'NotebookLMで施策振り返り', tools: ['NotebookLM'], challenge: '施策の振り返りをアナリストに依頼すると工数がかかり、タイミングが合わなかった', solution: 'SQL生成や分析要件設計が可能なNotebookLMを作成し、現場が自ら分析できる環境を整備', result: 'アナリスト工数が大幅削減、現場の分析スキル向上という副次効果も', voice: 'データへの理解が深まり、自分たちで施策効果を可視化できるようになりました', steps: ['分析に必要なテーブル定義書をNotebookLMにアップロード', 'サンプルクエリや分析観点もソースとして追加', '「〇〇施策の効果を分析するSQLを作成して」と指示', 'NotebookLMがSQLを生成', '生成されたSQLを実行し、結果を確認'] },
+    { id: 42, cat: 'document', title: 'Gemで告知文章のライティングを標準化', tools: ['Gemini', 'Gem'], challenge: '文章の癖が人によって異なり、ブランドイメージの統一と確認に時間がかかった', solution: 'GeminiのGemで文章の「型」となるプロンプトを設定してチームで共有', result: '文章作成の属人化が解消され、チーム全体で品質が統一、作業効率も大幅向上', voice: '誰でもスピーディーに質の高い文章を作成できるようになりました', steps: ['ブランドトーン・文章ルールを整理', 'Geminiで「Gem」を新規作成', 'システムプロンプトに「あなたは〇〇ブランドのライターです。以下のルールに従って...」と設定', '文章例を含めて精度を高める', 'チームメンバーにGemを共有'] },
+    { id: 43, cat: 'document', title: 'Meetの文字起こしからReadmeを短時間で作成', tools: ['Gemini', 'NotebookLM'], challenge: '開発環境の構築手順をドキュメント化するのに手間と時間がかかっていた', solution: 'Google Meetでの口頭説明を文字起こしし、Geminiでドキュメント化。NotebookLMで詳細を質問可能に', result: '構造化されたドキュメントが一発で完成、作成時間が大幅削減', voice: '双方にとって気持ちの良いコミュニケーションで環境構築が進められました', steps: ['Google Meetで環境構築の説明を録画・文字起こし', '文字起こしデータをGeminiに渡す', '「このやり取りをReadme形式のドキュメントにまとめて」と指示', '生成されたドキュメントをレビュー・編集', 'NotebookLMにアップロードしてQ&A対応可能に'] },
+    { id: 44, cat: 'document', title: '100ページの資料をAIで目次作成・ページ整理', tools: ['Gemini'], challenge: '100ページの資料のページ追加や構成入れ替え時、目次更新が非常に煩雑だった', solution: 'GeminiにPDFを読み込ませ、目次作成とページ入れ替え案を検討・作成', result: '資料全体像の把握がすぐに完了し、編集・整理作業が大幅に効率化', voice: '構成変更やページ入れ替えといったクリエイティブな作業に集中できるようになりました', steps: ['大容量PDFをGeminiにアップロード', '「この資料の目次を作成して」と指示', '生成された目次で全体構成を把握', '「〇〇セクションと△△セクションの順序を入れ替える提案をして」と依頼', '提案を参考に資料を編集'] },
+    { id: 45, cat: 'planning', title: 'アイデアを1日でプロトタイプ化', tools: ['Gemini', 'GitHub Copilot'], challenge: '企画案からプロトタイプ開発の仕様作成に時間がかかり、アイデアの鮮度が落ちていた', solution: '企画案を入力すると仕様概要を自動出力するプロンプトを作成、1日でバイブコーディング', result: 'アイデアからプロトタイプまでのリードタイムがかなり短縮', voice: '思いついた熱量のまま、プロトタイプ開発ができるのは便利', steps: ['アイデアを箇条書きで整理', 'Geminiに「このアイデアの機能仕様書を作成して」と依頼', '仕様書をベースにGitHub Copilotでコーディング', '「この機能を実装して」と対話しながら開発', '1日でプロトタイプを完成'] },
+    { id: 46, cat: 'data', title: '人事異動データの整理をAIでミスなく時間短縮', tools: ['Gemini'], challenge: 'データ整理の前に読み解くことに時間がかかり、人為的ミスも多かった', solution: 'Geminiにデータを読み込ませ、グループ化・期間結合・並び替え等を自動化', result: 'データを読み解く時間が大幅削減され、ミスも減少', voice: '本来注力すべき資料の中身の作成に集中できるようになりました', steps: ['異動データをCSVまたはスプレッドシートで準備', 'Geminiにデータをアップロード', '「このデータを部署別にグループ化し、期間で並び替えて」と指示', 'AIが整理されたデータを出力', '結果を確認し、資料作成に活用'] },
+    { id: 47, cat: 'meeting', title: '過去の議事録から議論の抜け漏れや課題を抽出', tools: ['Gemini'], challenge: 'MTGで議論が白熱すると、議論観点に抜け漏れが発生することがあった', solution: 'Geminiに会議情報を提供し、次回MTGで議論すべきこと・見落としリスクをまとめる', result: '議論点の見落としを客観的に洗い出し、アジェンダをより良くできた', voice: '過去の議事録を遡る作業が、すぐに要点をまとめられるようになりました！', steps: ['過去数回分の議事録を収集', 'Geminiに議事録をアップロード', '「これらの議事録から未解決の課題と次回議論すべき点を抽出して」と指示', 'AIが抜け漏れリスクと推奨アジェンダを生成', '次回会議のアジェンダに反映'] },
+    { id: 48, cat: 'learning', title: '24時間365日対応のセキュリティ相談AIチャット', tools: ['NotebookLM'], challenge: '初歩的な疑問に「誰に何を聞けばいいか」分からず、社内規程から情報を探すのが大変だった', solution: '社内規程をチューニングして学習した「セキュリティ相談AIチャット」を公開', result: 'ちょっとした疑問が即座に案内され、複雑な相談も論点が整理されて問合せがスムーズに', voice: '「まずAIに聞く習慣ができた」「資料を探す手間がゼロになった！」と好評です', steps: ['社内セキュリティ規程・ガイドラインを収集', 'NotebookLMにすべてのドキュメントをアップロード', 'よくある質問と回答例をテストして精度を確認', '必要に応じてソースを追加・調整', 'NotebookLMの共有リンクを社内展開'] },
+    { id: 49, cat: 'automation', title: 'LLMで単純作業を自動化＆イレギュラーにも対応', tools: ['ChatGPT'], challenge: 'ワークフロー申請で定型作業が多いが、イレギュラー対応も必要で完全自動化は困難だった', solution: 'LLM（ChatGPT 4.1）を組み込んだ自動化ツールを開発、イレギュラーにも柔軟に対応', result: '人間が行っていた作業の大部分をAIに任せ、業務効率が大幅向上', voice: 'これまで諦めていた業務の自動化が可能になりました', steps: ['自動化対象のワークフローを整理', 'ChatGPT APIを取得', 'Zapier/Make等の自動化ツールでワークフローを構築', 'LLMノードを追加し、イレギュラー判定ロジックを設定', 'テスト実行して精度を確認、本番運用開始'] },
+    { id: 50, cat: 'data', title: 'Deep Researchでイベントアンケート分析', tools: ['Gemini', 'DeepResearch'], challenge: '数値や傾向が何を示すか言語化するには分析力とドメイン知識が必要だった', solution: 'アンケート集計結果とイベント概要をGeminiに読み込ませ、Deep Researchで分析', result: '分析観点の洗い出しとレポート作成までAIが行い、非常に効率的に', voice: 'イベントの課題や伸長ポイントを短時間で洗い出し、アクション提案を即時に共有できました', steps: ['アンケート集計結果をCSVまたはスプレッドシートで準備', 'イベント概要資料も用意', 'Gemini Deep Researchにデータをアップロード', '「このアンケート結果を分析し、課題と改善提案をまとめて」と指示', '分析レポートを確認し、関係者に共有'] },
+    { id: 51, cat: 'coding', title: 'AIがリポジトリの案内人に', tools: ['GitHub Copilot'], challenge: '初めて触る大規模なコードリポジトリの全体像把握に時間がかかっていた', solution: 'GitHub Copilotにリポジトリ概要を説明させたり、処理の場所を質問', result: 'リポジトリの構造や主要処理を短時間でキャッチアップできるようになった', voice: '新しい技術やプロダクトへのキャッチアップが格段に楽になりました', steps: ['VS CodeでGitHub Copilot Chat有効化', 'リポジトリを開く', 'Copilot Chatに「このリポジトリの全体構成を説明して」と質問', '「〇〇の処理はどこにある？」等で具体的な場所を特定', '関連ファイルを開きながら理解を深める'] },
+    { id: 52, cat: 'meeting', title: 'AIアシスタントがチームの創造性を解放', tools: ['AI'], challenge: '進捗報告に時間がかかり議論時間が不足、アジェンダ作成やコピペ地獄に悩んでいた', solution: '定型業務をAIに任せ、人間は議論・アイデア創出・意思決定に集中', result: '会議は「報告の場」から「創造の場」へ。準備から事後処理までAIが支援', voice: '毎週の定例準備がほぼゼロになり、戦略的な議論に時間を使えるようになりました', steps: ['会議の定型作業を洗い出し（アジェンダ作成、議事録作成等）', '各作業に適したAIツールを選定', 'アジェンダ自動作成、議事録自動生成の仕組みを構築', '会議時間を「議論・意思決定」に集中', '事後処理もAIで自動化'] },
+    { id: 53, cat: 'document', title: '50枚超のスライドの誤字脱字チェックを数分で', tools: ['Gemini', 'Gem'], challenge: '50枚以上のスライドを複数人で目視確認しており、時間がかかり見落としもあった', solution: 'チェック観点をGeminiに伝えスライド校正用Gemを作成、固有名詞のファクトチェックも可能に', result: '数人がかりで数時間かかっていたチェックが数分で完了、品質も安定', voice: 'ドライブからスライドを選ぶだけで統一されたアウトプットが得られ助かりました', steps: ['校正ルール（表記統一、NG表現等）を整理', 'GeminiでGemを新規作成', 'システムプロンプトに校正ルールを設定', 'Googleドライブ連携でスライドを選択', 'AIが誤字脱字・表記揺れを検出してリストアップ'] },
+    { id: 54, cat: 'design', title: '手書きメモをFigma/draw.ioで編集可能な形式に変換', tools: ['Gemini', 'Figma'], challenge: '手書きのワイヤーフレームやフロー図をFigmaで清書し直すのは二度手間だった', solution: '手書きメモの写真をGeminiに渡し、Figmaやdraw.ioで編集可能なデータ形式に変換', result: '手書きからPC上で継続編集できるようになり、アイデアを形にするスピードが向上', voice: '思考を止めずに、シームレスに資料化することが可能です', steps: ['手書きのワイヤーフレームやフロー図を撮影', 'Geminiに画像をアップロード', '「このフロー図をMermaid記法で出力して」または「SVGで出力して」と指示', '出力されたコードをdraw.ioやFigmaにインポート', 'デジタル上で編集を継続'] },
+    { id: 55, cat: 'automation', title: 'Gemini CLIでGitHub Issueの確認を効率化', tools: ['Gemini CLI'], challenge: 'GitHubのissueが増えると、更新漏れや今日やるべきタスクの把握が大変だった', solution: 'Gemini CLIにghコマンドを実行させ、自然言語でタスク状況を確認できるように', result: '毎日のタスク確認が対話形式で簡単になり、見落としが減った', voice: 'コマンドラインからAIに話しかけるだけでタスク状況がわかり、非常にスムーズです', steps: ['Gemini CLIをインストール', 'GitHub CLIも設定済みであることを確認', 'ターミナルでGemini CLIを起動', '「今日対応すべきissueを教えて」と自然言語で質問', 'AIがghコマンドを実行し、結果を整理して回答'] },
+    { id: 56, cat: 'research', title: '視察出張プランをAIと作成', tools: ['Gemini', 'NotebookLM'], challenge: '視察出張のリサーチやプランニングに多くの時間がかかり、特に海外情報収集は大変だった', solution: 'Geminiで視察地域の概要・スポット候補を洗い出し、NotebookLMに文献を読み込ませてポイントをまとめる', result: '現地での視察がスムーズになり、帰国後の報告書作成も捗った', voice: 'ポイントを絞って効率的に見て回れ、移動中にも音声で予習できて大変便利でした', steps: ['視察の目的・テーマを整理', 'Geminiに「〇〇地域の△△に関する視察スポット候補を挙げて」と依頼', '候補から訪問先を選定', '関連文献をNotebookLMにアップロードし、音声概要を生成', '移動中に音声で予習し、効率的に視察'] },
+    { id: 57, cat: 'learning', title: 'GeminiをパーソナルトレーナーにしてFigma学習', tools: ['Gemini'], challenge: 'AI生成画像は微調整が必要で、デザインツールを学習して自分で作りたかった', solution: 'Geminiに「1週間のFigma集中学習スケジュール」を作成してもらい、それに沿って学習', result: '既存LPのKV差し替えやボタン新規作成を自分で対応できるようになった', voice: '体系的にFigmaを学べ、企画の立案から実行までのスピード感が上がりました', steps: ['学習目標を明確化（例：LPのKV差し替えができるようになる）', 'Geminiに「Figma初心者が1週間で〇〇できるようになる学習スケジュールを作成して」と依頼', '生成されたスケジュールに沿って毎日学習', '不明点はGeminiに質問しながら進める', '最終日に実際のタスクで成果を確認'] },
+    { id: 58, cat: 'document', title: '新旧PDF文書を比較し新旧対照表を一発生成', tools: ['Gemini'], challenge: '社内規程改定時の新旧対照表作成が手間で、ミスも発生しがちだった', solution: '変更前後のPDFをGeminiに読み込ませ「変更箇所を抽出し新旧対照表として出力」と指示', result: '一覧化作業が一瞬で完了し、大幅な効率化とミス軽減を実現', voice: 'PDFを読み込ませるだけで正確な新旧対照表が出来上がり、大変効率的でした', steps: ['改定前と改定後のPDFを準備', 'Geminiに両方のPDFをアップロード', '「この2つのPDFの変更箇所を抽出し、新旧対照表を作成して」と指示', 'AIが差分を検出し、表形式で出力', '内容を確認し、社内共有用に整形'] },
+    { id: 59, cat: 'data', title: 'クラスター分析結果の解釈とネーミングを自動提案', tools: ['Gemini', 'ChatGPT'], challenge: 'クラスター分析後の解釈とネーミングは熟練者でも時間がかかる工程だった', solution: '分析結果の数表をそのまま生成AIに読み込ませ、各グループの解釈とネーミングを依頼', result: 'AIの提案はほぼそのまま使えるレベルで、レポート作成工数が削減、質も向上', voice: 'ウンウン唸りながら考えていたネーミングを、AIが的確に提案してくれます', steps: ['クラスター分析結果（各クラスターの特徴量）をCSVで出力', 'Geminiまたは ChatGPTにデータをアップロード', '「各クラスターの特徴を解釈し、分かりやすいネーミングを提案して」と指示', 'AIが各クラスターの解釈と名前を提案', '提案を確認し、レポートに反映'] },
+    { id: 60, cat: 'automation', title: 'GASでトレンド分析から調査プロンプト生成まで自動化', tools: ['Gemini', 'GAS', 'DeepResearch'], challenge: 'トレンド把握のためのWeb記事収集・分析からアイディア発見まで、手動では膨大な時間がかかった', solution: 'GASでWeb記事収集→頻出ワード抽出→Deep Research用プロンプト自動生成を自動化', result: '再現性のあるアイディア創出プロセスを仕組み化、リサーチの質とスピードが大幅向上', voice: 'より客観的で質の高いアイディア創出につながっています', steps: ['RSSフィードやニュースAPIでWeb記事を収集するGASを作成', '収集した記事から頻出キーワードを抽出する処理を追加', 'キーワードからDeep Research用プロンプトを自動生成', '生成されたプロンプトでDeep Researchを実行', '結果をスプレッドシートに蓄積して分析'] },
+    { id: 61, cat: 'automation', title: 'GAS未経験者が工数管理ツールをAIと作成', tools: ['ChatGPT', 'GAS'], challenge: '業務カテゴリごとの時間把握をしたかったが、非エンジニアで自分でツールが作れなかった', solution: 'ChatGPTに助けてもらいながらGoogleカレンダーから情報を抽出するGASを作成', result: 'ボタンを押すだけで業務時間の可視化ができるツールが完成', voice: 'GASを書いたことがなくても、エラーを見せて相談すれば修正できるので諦めずに完成できました！', steps: ['実現したい機能を整理（カレンダーから予定を取得、カテゴリ別に集計等）', 'ChatGPTに「Googleカレンダーの予定をカテゴリ別に集計するGASを作成して」と依頼', '生成されたコードをApps Scriptに貼り付け', 'エラーが出たらエラーメッセージをChatGPTに伝えて修正', '動作確認し、ボタンで実行できるように設定'] },
+    { id: 62, cat: 'automation', title: 'メールの重要度仕分けとサマリ通知で工数削減', tools: ['Gemini', 'GAS'], challenge: '毎日大量のメール確認に工数がかかり、見落としリスクもあった', solution: 'GeminiとGASで受信メールを重要度別に仕分けし、サマリを通知するスクリプトを作成', result: '朝夕にメール全体をざっと確認でき、見落としリスクと確認工数が大幅削減', voice: 'メール見落としのリスクと確認工数がかなり削減しました', steps: ['重要度判定の基準を整理（送信者、件名キーワード等）', 'Geminiに「Gmailの受信メールを重要度別に仕分けするGASを作成して」と依頼', 'Gemini APIを使った重要度判定ロジックを追加', '朝夕にサマリをSlackやメールで通知する処理を追加', 'トリガーを設定して自動実行'] },
+    { id: 63, cat: 'design', title: 'ブランドのトンマナに沿った配色パターンをAIで出力', tools: ['Cursor'], challenge: 'ブランドのトンマナに沿った配色を考える際、多くのパターンを試作するのが手間だった', solution: 'Cursorで指定した条件でカラーコードの組み合わせを複数パターン生成', result: '多くの配色パターンを迅速に比較検証でき、デザインの意思決定が効率化', voice: 'クリエイティブな比較検証作業に集中できるようになりました', steps: ['ブランドカラーと配色ルール（コントラスト比等）を整理', 'Cursorで「以下の条件に合う配色パターンを10個生成して」と指示', 'AIがカラーコードの組み合わせを複数提案', 'プレビューして比較検討', '最適なパターンを採用'] },
+    { id: 64, cat: 'meeting', title: 'AI議事録活用でレビューの質・速度を3倍に改善', tools: ['Google Meet', 'Gemini'], challenge: 'コメント機能でのレビューはコンテキストが伝わらず、何度もやり取りが発生した', solution: 'Google MeetのAI議事録で30分間直接会話してレビュー、議事録をGeminiで深掘り', result: '同じ30分でレビュー結果＋議事録＋Geminiによる添削という「3倍」のアウトプットが得られる', voice: 'この3倍のアウトプットがよりクリエイティブなアウトカムにつながることを体感しています', steps: ['Google Meetで文字起こしを有効にしてレビュー会議を実施', '30分間で口頭でレビューを実施', '会議終了後、自動生成された議事録を取得', 'Geminiに議事録を渡し「指摘事項を整理して」と指示', 'さらに「追加の改善提案をして」で深掘り'] },
+    { id: 65, cat: 'learning', title: 'Jiraチケットをまとめて振り返り資料のドラフト作成', tools: ['Claude Code', 'Atlassian MCP'], challenge: '半期ごとの個人振り返りは初期の記憶が曖昧で、後回しにしがちだった', solution: 'Claude CodeとAtlassian MCPで半期中のJiraチケットをまとめ、振り返り資料のドラフトを作成', result: 'ドラフトがあることで振り返り資料の作成が大幅に効率化', voice: '振り返りに着手しやすくなり、より本質的な内容に向き合う時間を増やせました', steps: ['Claude CodeにAtlassian MCPを設定', '「過去6ヶ月間の自分のJiraチケットを取得して」と指示', 'AIがチケット一覧を取得', '「この実績をもとに振り返り資料のドラフトを作成して」と依頼', 'ドラフトを確認・編集して完成'] },
+    { id: 66, cat: 'automation', title: 'プラットフォーム規約や海外法令の変更を自動通知', tools: ['ChatGPT', 'Gemini'], challenge: '業界レギュレーションや法令は不定期に更新され、自力で情報を追うのは大きな負担だった', solution: 'ChatGPTやGeminiに定期タスクを実行させ、特定Webサイトの変更を監視', result: '変更時にAIから通知が来る仕組みで、情報収集・整理の手間が90%軽減', voice: '重要な規約変更を見落とすリスクを減らしつつ、調査時間を大幅に削減できました', steps: ['監視対象のWebページURLを整理', 'GASでページ内容を定期取得するスクリプトを作成', '前回取得内容との差分を検出する処理を追加', '差分があればAIで要約してSlack通知', 'トリガーを設定して毎日自動実行'] },
+    { id: 67, cat: 'research', title: '音声解説→レポート熟読でトピック理解を高速化', tools: ['Gemini', 'NotebookLM', 'DeepResearch'], challenge: '新しいトピックの情報収集と深い理解に時間がかかっていた', solution: 'Deep Researchで日英両方で調査→NotebookLMで音声解説を生成→音声を聞いてからレポートを読む', result: '音声で概要を掴んでから詳細を読むことで、理解がより早く深くなった', voice: '日英両方でリサーチし、音声とテキストを組み合わせることで、インプットの質と速度が劇的に上がりました', steps: ['調査テーマを決定', 'Deep Researchで日本語・英語両方で調査を実行', '生成されたレポートをNotebookLMにアップロード', 'Audio Overview機能で音声解説を生成', '音声を聴いて概要を掴んでからレポートを精読'] },
+    { id: 68, cat: 'design', title: 'アイコンパターンを量産生成しデザインプロセス革新', tools: ['Gemini'], challenge: 'アイコンデザインで微細な違いのパターンを多数試作するには時間と労力が必要だった', solution: 'Geminiを活用してSVG形式でアイコンの組み合わせパターンを大量生成するプログラムを作成', result: '10000パターンを生成して方向性を決め、微調整を繰り返す新しいデザインプロセスが実現', voice: '試行錯誤の量と質が劇的に向上し、これまでにないデザインプロセスを体験できました', steps: ['アイコンの構成要素（形、色、サイズ等）を定義', 'Geminiに「SVG形式でアイコンのバリエーションを生成するPythonスクリプトを作成して」と依頼', 'パラメータを変えながら大量のパターンを生成', '生成されたアイコンを一覧表示して比較', '良いパターンを選定し、微調整して完成'] },
+    { id: 69, cat: 'coding', title: 'DevinとSlack連携でBizチームが直接PR作成', tools: ['Devin', 'Slack'], challenge: 'リダイレクト先URL変更など、都度エンジニアが対応する必要があり工数がかかっていた', solution: 'DevinをSlackと連携させ、Bizチームが遷移先を指定するだけでPRを自動作成', result: 'エンジニアが対応していた定型業務をBizチームで完結できるようになった', voice: 'エンジニア・ビジネス双方の業務効率が大幅に改善しました', steps: ['DevinにGitHubリポジトリへのアクセス権限を付与', 'DevinをSlackワークスペースに追加', 'Slackチャンネルで「@Devin 〇〇のリダイレクト先を△△に変更して」とメンション', 'DevinがPRを自動作成しSlackに通知', 'エンジニアがPRをレビューしてマージ'] },
+    { id: 70, cat: 'research', title: '調査データから「対話できるペルソナ」を生成', tools: ['Gemini', 'Gem'], challenge: 'ペルソナシートは情報量が限られ、人格表現に限界があり活用されにくかった', solution: '調査データをGeminiにコンテキストとして与え、「対話可能な人工人格」としてのペルソナを生成、Gemで共有', result: 'ユーザーに直接相談する感覚でペルソナを活用でき、的確な情報やアイデアが得られるように', voice: '実際の調査データに基づかせたのが肝。リアルなインサイトを親近感を持って活用できるようになりました', steps: ['ユーザー調査データ（インタビュー記録、アンケート結果等）を収集', 'GeminiでGemを新規作成', 'システムプロンプトに「あなたは以下の調査データに基づくペルソナです...」と設定', '調査データの詳細をコンテキストとして追加', 'Gemを共有し、チームがペルソナと対話可能に'] },
+    { id: 71, cat: 'design', title: '既存CSSとスクショからデザイン修正コードを即生成', tools: ['Gemini'], challenge: 'CSS修正で正確な変更箇所を見つけて記述するのに時間がかかっていた', solution: 'Geminiに既存CSSとデザインのスクショを渡し、変更内容をプロンプトで指示', result: 'AIが指示と画像を理解し、求めるデザインのCSS修正コードを具体的に生成', voice: '既存コードとビジュアルを両方インプットできるので、認識齟齬が減り精度の高い修正が可能に', steps: ['既存のCSSファイルを準備', '修正後のデザインイメージのスクリーンショットを撮影', 'Geminiに両方をアップロード', '「このCSSを、スクショのデザインに合わせて修正して」と指示', '生成されたCSSを適用してプレビュー確認'] },
+    { id: 72, cat: 'document', title: 'スプレッドシートのTODOから週報を自動作成', tools: ['Gemini'], challenge: 'TODOリストから完了タスクを抽出し報告資料にまとめる作業に時間がかかっていた', solution: 'Geminiで指定期間内に「done」になったタスクを自動ピックアップし、報告形式に出力', result: '報告資料のたたき台作成時間が大幅に短縮', voice: '面倒なタスクの書き出しや整理をAIに任せることで、報告業務の負担が大きく減りました', steps: ['スプレッドシートのTODOリストを準備（ステータス列あり）', 'Geminiにスプレッドシートのリンクまたはコピーを渡す', '「今週doneになったタスクを抽出し、週報形式でまとめて」と指示', 'AIが完了タスクを抽出し、週報形式で出力', '内容を確認し、必要に応じて編集'] },
+    { id: 73, cat: 'document', title: 'Cursorで文章作成・修正を快適に', tools: ['Cursor'], challenge: 'より丁寧な表現を検討したり、スムーズに文書作成したいニーズがあった', solution: 'エンジニア向けと思われがちなCursorを日常の文書作成（.mdファイル）に活用', result: '文章の推敲をAIサポートで効率化。デザイナーでも使いやすいツールとして定着', voice: '普段コーディングをしない職種の人でも、ドキュメントツールとしてぜひ試してみて欲しいです！', steps: ['Cursorをインストール', '.mdファイルを新規作成', '文章を書き始め、推敲したい箇所を選択', 'Cmd+K（Ctrl+K）で「より丁寧な表現に」等の指示', 'AIの提案を確認し、採用するか選択'] },
+    { id: 74, cat: 'document', title: 'インタビュー議事録から外部公開文書作成', tools: ['Gemini', 'Canvas'], challenge: 'インタビュー議事録を表現・構成・文字数を適正にした外部公開用文書にする必要があった', solution: 'Gemで作ったドラフトをCanvasで強弱調整・表現変更・文字数調整してブラッシュアップ', result: '制約とルールのある外部公開文書作成が効率化', voice: 'ドラフトを瞬時に作成、「もっとこうして」にも即時対応。もうGeminiなしには戻れません！', steps: ['インタビュー議事録を用意', 'Gemini Gemに「この議事録を〇〇向け記事にまとめて」と依頼', '生成されたドラフトをGemini Canvasで開く', 'Canvas上で「もっと簡潔に」「文字数を〇〇字に」等の調整', 'ブラッシュアップを繰り返して完成'] },
+    { id: 75, cat: 'coding', title: '最新ライブラリを迅速キャッチアップ', tools: ['Cursor', 'Claude Code'], challenge: 'LangChainなど変化の速い最新ライブラリの情報を素早くキャッチアップするのが困難だった', solution: 'DeepWikiで対話的に実装方法を確認、コーディング時はContext7 MCPで最新ドキュメントを参照', result: '最新ライブラリ情報を迅速にキャッチアップし、開発への組み込みが素早く行えるようになった', voice: 'AIのサポートで最新技術情報にも効率よく対応でき、開発の幅が広がりました', steps: ['DeepWikiで対象ライブラリのページを開く', '「〇〇の実装方法を教えて」と対話形式で質問', 'Context7 MCPをCursorまたはClaude Codeに設定', 'コーディング中に最新ドキュメントを自動参照', '最新のベストプラクティスに沿った実装を進める'] },
+    { id: 76, cat: 'design', title: 'Gemini Canvasで会社テンプレ準拠のスライド生成', tools: ['Gemini', 'Canvas'], challenge: '社内標準テンプレートに沿ったスライド作成に構成検討とデザイン調整で時間がかかった', solution: 'GeminiのCanvas機能で対話しながらアウトラインを決め、テンプレートに沿ったスライドを自動生成', result: 'コーディングやデザイン調整不要でたたき台が短時間で完成、初速が劇的に向上', voice: 'Geminiと壁打ちしているうちに構成と思考が整理され、スライドとしてアウトプットされる体験は革命的です', steps: ['プレゼンの目的・対象者を整理', 'Geminiに「〇〇のプレゼン構成を考えて」と依頼', 'Canvas機能で対話しながらアウトラインを詰める', '「この構成でスライドを生成して」と指示', '生成されたスライドを確認し、テンプレートに移植'] },
+    { id: 77, cat: 'learning', title: 'AI音声概要で勉強会の発表準備負荷ゼロ', tools: ['NotebookLM'], challenge: '勉強会は有益だが、発表者の資料準備や登壇準備の負荷が大きく継続が難しかった', solution: 'NotebookLMに関連資料を登録し、生成した「音声概要」を勉強会のコンテンツとして使用', result: '発表者の準備負荷がほぼゼロになり、議論の時間を取ることでアクティブな勉強会を開催できた', voice: '音声を聞くだけでインプットでき、開催のハードルが劇的に下がりました', steps: ['勉強会テーマに関連する資料を収集', 'NotebookLMに資料をアップロード', 'Audio Overview機能で音声概要を生成', '勉強会で音声を再生し、参加者と共有', '音声を聴いた後、議論やQ&Aの時間を設ける'] },
+    { id: 78, cat: 'design', title: 'Figma Makeでリッチなインタラクションを爆速試作', tools: ['Figma Make'], challenge: '従来のFigmaプロトタイプ機能ではリッチなインタラクションを表現しきれず、エンジニアとの共有が難しかった', solution: 'Figma Makeで高度なインタラクションを含むプロトタイプを作成', result: 'リッチなインタラクションをスピーディに試せ、コードベースのアウトプットでエンジニアとの議論がスムーズに', voice: 'デザインの意図を正確に伝えられ、グラフィック面での試行錯誤のスピードも格段に上がりました', steps: ['Figmaでデザインを準備', 'Figma Makeプラグインを有効化', '「このデザインに〇〇のインタラクションを追加して」と指示', 'AIがコードベースでインタラクションを生成', 'プレビューで動作確認し、エンジニアと共有'] },
+    { id: 79, cat: 'learning', title: 'GeminiをAIパーソナルトレーナーにして健康管理', tools: ['Gemini', 'Gem'], challenge: '筋トレや減量を自己流で行っていたが、専門知識がなくモチベーション維持も難しかった', solution: 'GeminiのGemで自分専用の「パーソナルトレーナー人格」を作成、メニューやPFCバランス、体脂肪率判定まで任せる', result: '5ヶ月で体重8kg減、体脂肪率9%減を達成。コンテストコンディションまで到達', voice: '些細な疑問や減量中のメンタルケアまでAIがサポートしてくれ、解像度が格段に上がりました', steps: ['目標（減量、筋肥大等）を明確化', 'GeminiでGemを新規作成', 'システムプロンプトに「あなたはパーソナルトレーナーです。私の目標は...」と設定', '毎日の食事・トレーニングを報告し、フィードバックを受ける', '定期的に進捗を確認し、メニューを調整'] },
+    { id: 80, cat: 'security', title: 'PacketProxyでAIエージェントの動作を計測・理解', tools: ['Gemini CLI', 'PacketProxy'], challenge: 'AIエージェントの内部でどのような情報がやり取りされているかブラックボックスで「なんとなく」使われがちだった', solution: '自社OSSのPacketProxyでGemini CLIの通信内容を解析し、コンテキストの扱い方を「計測」して解明', result: 'AIエージェントの動作原理を計測に基づいて理解でき、記事として寄稿', voice: '「なんとなく」で使っていたAIエージェントを、自信を持ってビジネスに組み込めるようになりました', steps: ['PacketProxy（OSSプロキシツール）をインストール', 'Gemini CLIの通信をPacketProxy経由に設定', 'AIエージェントを実行し、通信内容をキャプチャ', 'リクエスト/レスポンスの内容を分析', 'コンテキストの扱い方やトークン消費を可視化'] },
+    { id: 81, cat: 'automation', title: '5分でDiffツール作成', tools: ['Gemini', 'GAS'], challenge: 'スプレッドシートの仕様書で「前とどう変わった？」を目視で追うとミスも増え工数がかかっていた', solution: 'Geminiでスプレッドシートの差分を抽出する「Diffツール」を5分で作成', result: '変更箇所が一目でわかり、レビュー効率が劇的UP、変更漏れ・確認ミスも防止', voice: 'AIにDiffツールを作ってもらい、変更箇所の確認がミスなく高速に行えるようになりました', steps: ['Geminiに「スプレッドシートの2つのシートの差分を検出するGASを作成して」と依頼', '生成されたコードをApps Scriptに貼り付け', '比較対象のシート名を設定', 'スクリプトを実行', '差分がハイライトされた結果を確認'] },
+    { id: 82, cat: 'research', title: '「プロンプトレビュー用プロンプト」で精度向上', tools: ['Gemini'], challenge: '生成AIの回答の質はプロンプトに左右されるが、常に最適なプロンプトを作成するのは難しかった', solution: 'Geminiに「プロンプトの品質をレビューし改善案を提示する」メタ的なプロンプトを作成し、Gemとして登録', result: 'プロンプト品質の向上と、自分のプロンプトエンジニアリング能力向上にも繋がった', voice: '「AIによるAI改善」が簡単にでき、AIのポテンシャルを最大限に引き出せます', steps: ['GeminiでGemを新規作成', 'システムプロンプトに「ユーザーが入力したプロンプトをレビューし、改善案を提示してください」と設定', 'レビュー観点（明確さ、具体性、制約条件等）を追加', '作成したプロンプトをGemに入力', '改善提案を参考にプロンプトをブラッシュアップ'] },
+    { id: 83, cat: 'data', title: 'DifyベースでLLM定性分析基盤を構築', tools: ['Dify', 'Gemini', 'Claude'], challenge: 'SNSだけでは発信力のある人の意見に偏り、サービス内の多様なユーザーの声を網羅的に把握できなかった', solution: 'Difyベースの分析基盤を作成し、サービス内情報をLLMに取り込み定性的な反応を自動集計', result: '多様な情報を低工数で迅速に把握でき、施策の評価と改善サイクルが格段にアップ', voice: 'ユーザーのリアルな反応を効率的に集計・分析でき、施策の手応えを多角的に掴めるようになりました', steps: ['Difyでワークフローを新規作成', 'サービス内のユーザーフィードバックを取得するAPIを接続', 'LLMノードを追加し、フィードバックの分類・要約プロンプトを設定', '定期実行トリガーを設定', '分析結果をダッシュボードに出力'] },
+    { id: 84, cat: 'coding', title: 'UnityでFBXインポートの作業を自動化', tools: ['Gemini'], challenge: 'UnityでFBXファイルのインポート時、フォルダ振り分け・マテリアル割当・プレハブ化の定型作業が手間だった', solution: 'Geminiに自動化したいフローを箇条書きで指示し、AIと壁打ちしながらスクリプトを作成', result: '面倒なインポート作業を自動化するスクリプトが完成し、作業効率が大幅向上', voice: 'やりたいことを箇条書きにするだけでAIが壁打ち相手になり、実装方法もサポートしてくれました', steps: ['自動化したい作業フローを箇条書きで整理', 'Geminiに「UnityでFBXインポートを自動化するEditor拡張スクリプトを作成して」と依頼', '生成されたC#スクリプトを確認', 'Unityプロジェクトにスクリプトを配置', 'メニューから実行して動作確認'] },
+    { id: 85, cat: 'meeting', title: 'AIで問合せ対応を自動化', tools: ['Slack', 'Findout'], challenge: '従来のWebチケットシステムは問合せ対応に時間がかかり、担当者工数が増加していた', solution: 'Slackを問合せ窓口とし「まずAIに聞いて、分からなかったら人が対応」するAIネイティブな流れを構築', result: 'AIによる即時回答で多くの問合せがその場で完結、チケット件数20%減、解決時間40%短縮', voice: 'AIが最初に回答することで基本的な質問が減り、専門性を活かした対応に注力できています', steps: ['社内ナレッジベースをAIに学習させる', 'Slackボット（Findout等）を設定', '問合せチャンネルでボットをメンションすると自動回答', 'AIが回答できない場合は担当者にエスカレーション', '回答精度を確認しながらナレッジを追加'] },
+    { id: 86, cat: 'learning', title: 'サウンドの「事故例」をAI動画で再現し研修に活用', tools: ['Gemini'], challenge: '新卒研修で「サウンドと映像のズレ」の事故例を伝えたかったが、実際のプロジェクト動画は機密情報で使用不可だった', solution: 'Geminiの画像・動画生成機能でデモ画像・動画を作成し、意図的にサウンドをずらして事故例を再現', result: '口頭では伝わりにくかった「事故」を実物で見せることで、研修受講者の理解が深まった', voice: '「事故例を見て、サウンドに連絡する重要性がわかりました」とコメントがあり、研修の質を高めることができました', steps: ['再現したい事故のシナリオを整理', 'Geminiに「〇〇のシーンのデモ画像を生成して」と依頼', '生成された画像から動画を作成', '動画編集ソフトでサウンドを意図的にずらす', '研修で事故例として提示し、解説'] },
+    { id: 87, cat: 'coding', title: 'Photoshop自動化のJSXコーディングをAIが解決', tools: ['Gemini', 'ChatGPT'], challenge: 'Photoshop自動化のExtendScript(JSX)は日本語文献が少なく、扱えるエンジニアも限られ自動化のハードルが高かった', solution: 'GeminiやChatGPTに自然言語で指示し、JSXのコードを生成', result: 'ニッチな分野でもAIがコーディングをサポートし、Photoshopの定型作業を自動化する目処が立った', voice: 'マイナーな技術領域でもAIに相談すればコードを書いてくれることに驚きました', steps: ['自動化したい処理を言語化（例：全レイヤーをPNG書き出し）', 'GeminiまたはChatGPTに「PhotoshopのExtendScriptで〇〇するコードを作成して」と依頼', '生成されたJSXコードを確認', 'Photoshopの「ファイル」→「スクリプト」→「参照」で実行', '動作を確認し、必要に応じて修正'] },
+    { id: 88, cat: 'research', title: 'Slack常駐AIが仕様書検索やログ要約を代行', tools: ['Gemini API', 'Slack'], challenge: 'プロジェクトが長くなるにつれて仕様書・議事録・コードが膨大になり、検索コストが高くなっていた', solution: 'Gemini APIでSlackに常駐するAIエージェントを開発、Confluence仕様書検索や議事録要約などに対応', result: '情報検索の時間が大幅短縮、AIに聞けばSlack上で必要な情報が手に入るように', voice: '「あの仕様どうだっけ？」とメンションするだけで答えてくれ、チームに欠かせない一員です', steps: ['Gemini APIキーを取得', 'Slackボットを作成し、Gemini APIと連携', 'Confluence APIも連携して仕様書検索を可能に', 'ボットにメンションで質問すると回答を生成', '継続的にナレッジソースを追加して精度向上'] },
+    { id: 89, cat: 'research', title: 'アセットモチーフの参考事例収集をAIで', tools: ['Gemini', 'Gem'], challenge: 'デザインアセットのモチーフを検討する際、利用可能かどうかの調査・判断に専門知識と時間が必要だった', solution: 'Geminiで「条件にヒットするモチーフを検索」「利用可能条件にマッチするか診断」するGemを作成しチームで共有', result: 'モチーフ選定の初期段階でAIによるリスクスクリーニングが可能になり、手戻りリスクを低減', voice: 'ナレッジとしてチームで誰でも利用でき、属人化せずにモチーフ検討ができるようになりました', steps: ['モチーフ選定の判断基準（著作権、商標等）を整理', 'GeminiでGemを新規作成', 'システムプロンプトに判断基準と検索ロジックを設定', 'モチーフ候補を入力すると利用可否を判定', 'チームで共有して活用'] },
+    { id: 90, cat: 'data', title: 'スプレッドシートの大改修をGASで一括対応', tools: ['Gemini', 'GAS'], challenge: '複数ファイルを管理するスプレッドシートの全シートに一括で修正を行う必要があったが、手作業では膨大な時間がかかった', solution: 'Geminiに全シートを横断して修正を実行するGASを作成させる', result: '手作業なら数日かかる大規模改修が一瞬で完了し、管理シートの利便性が向上', voice: '何十枚・何千レコードのシートを一つ一つ手で直すことを考えると気が遠くなりそうでしたが、AIで一発で終わり大変効率的でした！', steps: ['修正内容を整理（列追加、値変換等）', 'Geminiに「複数のスプレッドシートの全シートに対して〇〇を実行するGASを作成して」と依頼', '生成されたコードをApps Scriptに貼り付け', '対象ファイルIDを設定', 'スクリプトを実行して一括修正'] },
+    { id: 91, cat: 'document', title: 'Notion連携でPRD/機能仕様書作成フロー構築', tools: ['Cursor', 'Notion'], challenge: 'PRDのみで運用していたが、開発・品質面での確認精度を上げるためFSD作成を試験導入', solution: 'Cursor AIでPRD/FSD作成の標準フローを構築、AIとの対話で要求を明確化し、不足情報はヒアリング', result: '必要な項目が網羅された状態でドキュメントが生成され、作成工数が大幅削減、属人化も解消', voice: 'フォーマット統一で読み手の確認コストも下がり、生産性が向上しました', steps: ['PRD/FSDのテンプレートを用意', 'Cursorで「このテンプレートに沿ってPRDを作成して」と指示', 'AIが不足情報を質問形式でヒアリング', '回答を元にドキュメントを生成', 'Notionにエクスポートして共有'] },
+    { id: 92, cat: 'learning', title: '100ページのマニュアルを音声解説＆Q&Aで共有', tools: ['NotebookLM'], challenge: '半期ごとの評価マニュアルは合計100ページにも及び、内容を読み込み理解するのに負担がかかっていた', solution: 'NotebookLMにマニュアル一式を読み込ませ、音声解説とQ&Aチャットが可能な状態でマネージャーに展開', result: '移動中に音声でインプットしたり、疑問点をチャットで即座に解消できるようになり、定着率と利便性が向上', voice: '音声解説でインプットでき、疑問を各々がチャットで質問可能になり便利とのお声を頂きました', steps: ['評価マニュアル一式をPDF等で準備', 'NotebookLMにすべてのファイルをアップロード', 'Audio Overview機能で音声解説を生成', 'NotebookLMの共有リンクをマネージャーに展開', '各自が音声で学習し、チャットで疑問を解消'] },
+    { id: 93, cat: 'design', title: 'BGM制作前にAIでラフ動画を作成しイメージ共有', tools: ['Gemini'], challenge: 'ゲームのサウンドイメージをBGM制作前にディレクターとすり合わせる際、具体的なイメージを伝えるのが難しかった', solution: 'Geminiでゲームイメージに近い画像を作成し、サウンドイメージ詳細を伝えてBGMありの動画を作成', result: 'BGM制作なしで具体的なすり合わせが可能になり、制作時間を短縮', voice: 'AIで作成した動画とサウンドを用いてスムーズにイメージを伝えることができました！', steps: ['サウンドイメージを言語化（テンポ、雰囲気、楽器等）', 'Geminiに「〇〇のイメージに合う画像を生成して」と依頼', '生成された画像を使ってラフ動画を作成', 'フリー素材やAI生成音源でBGMを仮当て', 'ディレクターとイメージをすり合わせ'] },
+    { id: 94, cat: 'document', title: '業務引継ぎ動画から業務マニュアルを作成', tools: ['Gemini'], challenge: '業務マニュアル作成に工数がかかりすぎていた', solution: '業務を引き継ぐ会議をZoomやMeetで録画し、動画をGeminiに渡してマニュアル化。まず構成案を作りレビューしてから詳細を生成', result: '細かなミスはあるものの、業務マニュアル作成の工数を大幅に削減', voice: '会議中の質疑応答も反映した内容でマニュアルの下書きを作成でき、とても便利です', steps: ['業務引継ぎ会議を録画', '動画ファイルをGeminiにアップロード', '「この動画から業務マニュアルの構成案を作成して」と指示', '構成案をレビューし、フィードバック', '「この構成で詳細なマニュアルを生成して」で完成'] },
+    { id: 95, cat: 'planning', title: '企画立案から提案まで全フローをAIと実行', tools: ['Gemini', 'NotebookLM', 'Copilot'], challenge: '通常業務と並行して新規企画を検討する際、調査・資料作成・モック作成に時間がかかり無理なく進めるのが困難だった', solution: '全フロー（企画立案、モック作成、調査レポート、スライド作成、インタビュー議事録など）でAIを活用、自分はAIとの対話と意思決定、最終調整のみ', result: '各工程の作業時間を大幅に短縮し、企画の質とスピードが向上', voice: 'ほぼAIとの対話と意思決定のみで、他はAIがやってくれたため大変効率的でした', steps: ['企画アイデアを整理', 'Geminiで市場調査・競合分析を実施', 'NotebookLMで関連資料を整理、インサイトを抽出', 'Copilotでモック・スライドを作成', '各工程でAIと対話し、最終調整のみ人間が実施'] },
+    { id: 96, cat: 'automation', title: '録画画面からGASコードを生成', tools: ['Gemini', 'GAS'], challenge: 'GAS作成時にやりたい処理や条件をテキストで詳細に言語化するのに時間がかかっていた', solution: '画面録画で「ここをこうしたい」と実際に操作しながら説明する短い動画を撮影し、Geminiに渡してスクリプトを作成', result: '前提情報をテキスト化する手間が省け、直感的な動画指示でベースのコードが作成でき、開発ハードルが劇的に低下', voice: '前提情報を伝える時間も手間も両方軽減できたのでおすすめです！', steps: ['スプレッドシート等の画面を録画しながら「ここをこうしたい」と音声で説明', '録画ファイルをGeminiにアップロード', '「この動画の操作を自動化するGASを作成して」と指示', 'AIが動画を解析し、GASコードを生成', 'コードを確認・実行して動作確認'] },
+    { id: 97, cat: 'learning', title: '1on1議事録を分析しメンター育成をAIが支援', tools: ['Vertex AI'], challenge: '新卒メンターの1on1スキルが属人化しており、効果的なフィードバックを得る機会が限られていた', solution: 'Meetの議事録をAIが解析し、社内ナレッジを参照してメンターへの改善フィードバックを自動生成', result: '1on1内容と社内ベストプラクティスを組み合わせた適切なフィードバックが可能になり、メンターの成長支援に繋がった', voice: '今後はさらに利用範囲を拡大し、全社の1on1品質向上に貢献していきたいです', steps: ['1on1のMeet議事録を収集', '社内の1on1ベストプラクティス資料を準備', 'Vertex AIで議事録を解析するパイプラインを構築', 'ベストプラクティスと照合してフィードバックを生成', 'メンターにフィードバックを共有'] },
+    { id: 98, cat: 'coding', title: '非エンジニアがChrome拡張作成でSlackを便利に', tools: ['GitHub Copilot'], challenge: 'Slackのチャンネル数が多くセクション管理だけでは視認性が低く誤爆リスクがあった', solution: 'AIでChrome拡張機能を実装、チャンネルによってテーマカラーを切り替えて分かりやすくする機能を作成', result: '外部チャンネルは赤くするなど視覚的に区別でき、使い勝手が向上', voice: '特別な環境なくてもAIで気軽にChrome拡張を作成できました', steps: ['実現したい機能を整理（例：特定チャンネルで背景色を変更）', 'GitHub Copilotに「Slackのチャンネルによって背景色を変えるChrome拡張を作成して」と依頼', '生成されたmanifest.json、content.jsを取得', 'chrome://extensionsでデベロッパーモードをONにし、読み込み', '動作を確認し、必要に応じて調整'] },
+    { id: 99, cat: 'automation', title: '「設計原則」と「制約条件」で手戻りを防ぐGASプロンプト', tools: ['Gemini', 'GAS'], challenge: 'AIにGASを依頼してもエラーや意図しない挙動になり、修正のやり取りに工数がかかることがあった', solution: '「絶対にエラーを出さない」堅牢性を最優先し、厳格な設計原則と制約条件を組み込んだプロンプトテンプレートを作成して社内共有', result: 'エラー発生頻度が大幅に下がり、極力修正のいらない高品質なスクリプトが一発で生成できるようになった', voice: '「これ自動化できるかもな」と考えてから実現するまでのスピードが早くなり、チームのAI化・自動化がグッと進んでいます！', steps: ['GAS生成時によく発生するエラーパターンを収集', '「エラーを出さない」ための設計原則を整理', 'プロンプトテンプレートに設計原則と制約条件を組み込む', 'テンプレートを使ってGASを生成', '社内でテンプレートを共有し、品質を標準化'] },
+    { id: 100, cat: 'planning', title: 'Gemini CanvasとGoogle Sitesでプロト開発', tools: ['Gemini', 'Canvas', 'Google Sites'], challenge: 'PRDや要件定義のドキュメントだけでは実現方法やUXのイメージが伝わりにくかった', solution: 'GeminiのCanvasでプロトタイピングし、htmlをGoogle Sitesに貼り付けてチーム内に動作するプロトタイプを公開', result: 'イメージやUXの共有が爆速になり、詳細な設計や工数見積もりの速度が上がり、手戻りも減った', voice: '実装前に社内のイメージのすり合わせを十全にやることで手戻りを減らせました', steps: ['企画のUI/UXイメージを整理', 'Gemini Canvasで「〇〇の画面をHTML/CSS/JSでプロトタイプを作成して」と依頼', '生成されたHTMLコードを取得', 'Google Sitesで「埋め込み」→「コード埋め込み」でHTMLを貼り付け', 'サイトを公開し、チームでプロトタイプを確認'] }
+];
+
+// フィルタ生成
+const filtersEl = document.getElementById('filters');
+[{ id: 'all', name: 'ALL' }, ...cats].forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn en' + (cat.id === 'all' ? ' active' : '');
+    btn.dataset.category = cat.id;
+    btn.textContent = cat.name;
+    filtersEl.appendChild(btn);
+});
+
+// サイドバー生成
+const catNavEl = document.getElementById('catNav');
+cats.forEach((cat, i) => {
+    const count = tips.filter(t => t.cat === cat.id).length;
+    const li = document.createElement('li');
+    li.className = 'cat-nav-item';
+    li.dataset.category = cat.id;
+    li.innerHTML = '<span class="cat-nav-num en">' + String(i + 1).padStart(2, '0') + '</span><span class="cat-nav-name">' + cat.name + '</span><span class="cat-nav-count en">' + count + '</span>';
+    catNavEl.appendChild(li);
+});
+
+// コンテンツ生成
+const contentEl = document.getElementById('content');
+cats.forEach((cat, i) => {
+    const catTips = tips.filter(t => t.cat === cat.id);
+    const section = document.createElement('section');
+    section.className = 'category-section';
+    section.dataset.category = cat.id;
+    section.innerHTML = '<div class="category-header"><div><div class="category-num en">' + String(i + 1).padStart(2, '0') + '. ' + cat.nameEn.toUpperCase() + '</div><h2 class="category-title">' + cat.name + '</h2></div><div class="category-count en">' + catTips.length + ' Cases</div></div><div class="tips-grid">' + catTips.map(tip => '<div class="tip-card" data-id="' + tip.id + '"><div class="tip-top"><span class="tip-num en">' + String(tip.id).padStart(3, '0') + '</span><span class="tip-arrow">→</span></div><div class="tip-title">' + tip.title + '</div><div class="tip-tools">' + tip.tools.map(t => '<span class="tool-tag en">' + t + '</span>').join('') + '</div></div>').join('') + '</div>';
+    contentEl.appendChild(section);
+});
+
+// フィルタ
+document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const cat = btn.dataset.category;
+        document.querySelectorAll('.category-section').forEach(s => {
+            s.style.display = (cat === 'all' || s.dataset.category === cat) ? 'block' : 'none';
+        });
+    });
+});
+
+// サイドバークリック
+document.querySelectorAll('.cat-nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+        const cat = item.dataset.category;
+        const section = document.querySelector('.category-section[data-category="' + cat + '"]');
+        if (section) section.scrollIntoView({ behavior: 'smooth' });
+    });
+});
+
+// 検索
+document.getElementById('searchInput').addEventListener('input', (e) => {
+    const term = e.target.value.toLowerCase();
+    document.querySelectorAll('.tip-card').forEach(card => {
+        const title = card.querySelector('.tip-title').textContent.toLowerCase();
+        const tools = card.querySelector('.tip-tools').textContent.toLowerCase();
+        card.style.display = (title.includes(term) || tools.includes(term)) ? 'flex' : 'none';
+    });
+    document.querySelectorAll('.category-section').forEach(section => {
+        const hasVisible = section.querySelector('.tip-card[style="display: flex;"], .tip-card:not([style])');
+        section.style.display = hasVisible ? 'block' : 'none';
+    });
+});
+
+// モーダル
+const overlay = document.getElementById('overlay');
+const modal = document.getElementById('modal');
+const close = () => { overlay.classList.remove('active'); modal.classList.remove('active'); };
+overlay.addEventListener('click', close);
+document.getElementById('closeBtn').addEventListener('click', close);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+
+document.querySelectorAll('.tip-card').forEach(card => {
+    card.addEventListener('click', () => {
+        const id = parseInt(card.dataset.id);
+        const tip = tips.find(t => t.id === id);
+        if (!tip) return;
+        const cat = cats.find(c => c.id === tip.cat);
+        document.getElementById('modalMeta').textContent = 'No. ' + String(tip.id).padStart(3, '0') + ' — ' + cat.nameEn;
+        document.getElementById('modalTitle').textContent = tip.title;
+        document.getElementById('modalTools').innerHTML = tip.tools.map(t => '<span class="tool-tag en">' + t + '</span>').join('');
+        document.getElementById('modalBody').innerHTML = '<div class="modal-section"><div class="modal-label en">Challenge</div><div class="modal-text">' + tip.challenge + '</div></div><div class="modal-section"><div class="modal-label en">Solution</div><div class="modal-text">' + tip.solution + '</div></div><div class="modal-section"><div class="modal-label en">Result</div><div class="modal-text">' + tip.result + '</div></div><div class="modal-steps"><div class="modal-steps-title en">How to Implement</div><ol class="modal-steps-list">' + tip.steps.map(step => '<li>' + step + '</li>').join('') + '</ol></div><div class="modal-quote"><div class="modal-quote-text">' + tip.voice + '</div><div class="modal-quote-label en">User Voice</div></div>';
+        overlay.classList.add('active');
+        modal.classList.add('active');
+    });
+});
+</script>
+</body>
+</html>
